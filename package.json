@@ -1,26 +1,13 @@
 {
-  "name": "reviewbot",
-  "version": "1.0.0",
-  "private": true,
-  "description": "A bot to assist with code reviews via AI.",
-  "author": "richiemccoll",
-  "license": "ISC",
-  "homepage": "https://github.com//",
-  "keywords": [
-    "probot",
-    "github",
-    "probot-app"
-  ],
-  "scripts": {
-    "start": "probot run ./index.js"
-  },
-  "dependencies": {
-    "probot": "^12.2.4"
-  },
-  "devDependencies": {
-    "smee-client": "^1.2.2"
-  },
-  "engines": {
-    "node": ">= 10.13.0"
-  }
+    "name": "reviewbot",
+    "scripts": {
+        "dev": "npm run dev --workspaces"
+    },
+    "workspaces": [
+        "backend",
+        "github-app"
+    ],
+    "dependencies": {
+        "pino-pretty": "^9.4.0"
+    }
 }

@@ -1,33 +1,15 @@
 # reviewbot
 
-> A GitHub App to assist with code reviews via AI.
+A bot that assists with code reviews, using AI.
 
-## Setup
+## Usage
 
-```sh
-# Install dependencies
-npm install
-
-# Run the bot
-npm start
+Install the Github app and use the following command:
+```
+/reviewbot review
 ```
 
-## Docker
+##  Services
 
-```sh
-# 1. Build container
-docker build -t reviewbot .
-
-# 2. Start container
-docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> reviewbot
-```
-
-## Contributing
-
-If you have suggestions for how reviewbot could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
-
-For more, check out the [Contributing Guide](CONTRIBUTING.md).
-
-## License
-
-[ISC](LICENSE) © 2023 richiemccoll
+- `backend` (contains the reviewbot service + transformer API interactions)
+- `github-app` (contains the probot service that interacts with Github + `backend`)
