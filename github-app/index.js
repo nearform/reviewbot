@@ -61,7 +61,7 @@ module.exports = async (app) => {
       if (response.status !== 200) {
         app.log.error("[reviewbot] - error scheduling review request");
         throw new Error(
-          `received status code ${response.status} instead of 201`
+          `received status code ${response.status} instead of 200`
         );
       }
     } catch (error) {

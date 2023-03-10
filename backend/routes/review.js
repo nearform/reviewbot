@@ -17,13 +17,13 @@ export default async function review(fastify) {
         },
       },
     },
-    async (request) => {
+    async (request, reply) => {
       const dynamicPrompt = promptEngine.build(JSON.parse(request.body));
       const response = await suggestions.create({
         transformerType: "chatGPT",
         payload: dynamicPrompt,
       });
-      return response;
+      return reply.status(200).send(response);
     }
   );
 }
