@@ -18,7 +18,7 @@ export default async function review(fastify) {
       },
     },
     async (request) => {
-      const dynamicPrompt = promptEngine.build(request.body);
+      const dynamicPrompt = promptEngine.build(JSON.parse(request.body));
       const response = await suggestions.create({
         transformerType: "chatGPT",
         payload: dynamicPrompt,

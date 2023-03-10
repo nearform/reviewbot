@@ -49,13 +49,13 @@ module.exports = async (app) => {
         },
       });
 
-      const parsedPatch = parseGitPatch(diff);
+      const { files } = parseGitPatch(diff);
 
       app.log.info("[reviewbot] - scheduling review request");
 
       const response = await fetch(process.env.REVIEWBOT_SERVICE, {
         method: "POST",
-        body: JSON.stringify(parsedPatch),
+        body: JSON.stringify(files),
       });
 
       if (response.status !== 200) {
