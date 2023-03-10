@@ -1,3 +1,5 @@
+const parseGitPatch = require("parse-git-patch").default;
+
 /**
  * This is the main entrypoint to the Probot app
  * @param {import('probot').Probot} app
@@ -25,15 +27,6 @@ module.exports = async (app) => {
         return;
       }
 
-      app.log.info("[reviewbot] - getting git diff for files changed");
-
-      const pullRequest = context.pullRequest();
-      const { data } = await context.octokit.pulls.listFiles({
-        owner: issue.owner,
-        repo: issue.repo,
-        pull_number: pullRequest.pull_number,
-      });
-
       app.log.info("[reviewbot] - ack author comment");
 
       await context.octokit.reactions.createForIssueComment({
@@ -43,17 +36,26 @@ module.exports = async (app) => {
         repo: issue.repo,
       });
 
-      app.log.info("[reviewbot] - scheduling review request");
+      app.log.info("[reviewbot] - getting git diff for files changed");
 
-      // Create a review request
-      const payload = data.map((file) => ({
-        filename: file.filename,
-        patch: file.patch,
-      }));
+      const pullRequest = context.pullRequest();
+
+      const { data: diff } = await context.octokit.rest.pulls.get({
+        owner: issue.owner,
+        repo: issue.repo,
+        pull_number: pullRequest.pull_number,
+        mediaType: {
+          format: "patch",
+        },
+      });
+
+      const parsedPatch = parseGitPatch(diff);
+
+      app.log.info("[reviewbot] - scheduling review request");
 
       const response = await fetch(process.env.REVIEWBOT_SERVICE, {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(parsedPatch),
       });
 
       if (response.status !== 200) {

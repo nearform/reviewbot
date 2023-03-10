@@ -8,6 +8,7 @@
         "github-app"
     ],
     "dependencies": {
+        "parse-git-patch": "^1.1.0",
         "pino-pretty": "^9.4.0"
     }
 }
