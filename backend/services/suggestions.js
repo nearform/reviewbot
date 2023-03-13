@@ -4,7 +4,7 @@ dotenv.config();
 
 const suggestions = {
   async callChatGPTService(payload) {
-    const apiUrl = "https://api.openai.com/v1/completions";
+    const apiUrl = "https://api.openai.com/v1/chat/completions";
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
@@ -12,9 +12,9 @@ const suggestions = {
         Authorization: `Bearer ${process.env.CHAT_GPT_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "text-davinci-003",
-        prompt: payload,
-        max_tokens: 256,
+        model: "gpt-3.5-turbo",
+        messages: payload,
+        max_tokens: 512,
       }),
     });
     const body = await response.json();
@@ -23,7 +23,7 @@ const suggestions = {
 
   _formatResponse(response) {
     return response.map((s) =>
-      s.choices.map((choice) => choice.text.trim()).join("")
+      s.choices.map((choice) => choice.message.content.trim()).join("")
     );
   },
   async create({ transformerType, payload }) {

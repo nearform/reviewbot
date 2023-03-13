@@ -25,7 +25,6 @@ const promptEngine = {
   },
   enhanceWithPromptContext(change) {
     const promptContext = `
-      You are are a senior software engineer and an emphathetic code reviewer.
       You will take in a git diff, and tell the user what they could have improved (like a code review)
       based on analyzing the git diff in order to see whats changed.
       The language in the snippet is JavaScript.
@@ -33,7 +32,13 @@ const promptEngine = {
 
       ${change}
     `;
-    return promptContext;
+    return [
+      {
+        role: "system",
+        content: `You are are a senior software engineer and an emphathetic code reviewer.`,
+      },
+      { role: "user", content: promptContext },
+    ];
   },
   build(payload) {
     const filesWithModifiedLines = this.filterOnlyModified(payload);
