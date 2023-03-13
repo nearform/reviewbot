@@ -18,7 +18,9 @@ export default async function review(fastify) {
             filename: file.fileName,
             lineRange: file.changes[index].range,
             diff: file.changes[index].diff,
-            suggestions: suggestion.choices.map((choice) => choice.text),
+            suggestions: suggestion.choices
+              .map((choice) => choice.text)
+              .join(""),
           };
         });
 

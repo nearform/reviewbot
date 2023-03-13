@@ -35,6 +35,7 @@ const promptEngine = {
       If there are any obvious bugs, highlight them as blocking.
       If there are any observations or something that the author of the code review should think about it,
       highlight it as optional in bold.
+      Limit any suggestions to 3 sentences maximum. 
 
       ${change}
     `;

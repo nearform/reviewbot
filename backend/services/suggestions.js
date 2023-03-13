@@ -14,6 +14,7 @@ const suggestions = {
       body: JSON.stringify({
         model: "text-davinci-003",
         prompt: payload,
+        max_tokens: 128,
       }),
     });
     const body = await response.json();
