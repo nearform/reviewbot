@@ -12,7 +12,7 @@
     "probot-app"
   ],
   "scripts": {
-    "dev": "probot run ./index.js"
+    "dev": "node --watch ./index.js"
   },
   "dependencies": {
     "probot": "^12.2.4"
