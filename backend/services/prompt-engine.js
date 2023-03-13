@@ -29,13 +29,7 @@ const promptEngine = {
       You will take in a git diff, and tell the user what they could have improved (like a code review)
       based on analyzing the git diff in order to see whats changed.
       The language in the snippet is JavaScript.
-      Feel free to provide any examples/code snippets in your answer.
-      These should be formatted in markdown language syntax.
-      Highlight any suggestions that would be considered nitpicks with nit in bold.
-      If there are any obvious bugs, highlight them as blocking.
-      If there are any observations or something that the author of the code review should think about it,
-      highlight it as optional in bold.
-      Limit any suggestions to 3 sentences maximum. 
+      Feel free to provide any examples as markdown code snippets in your answer.
 
       ${change}
     `;
