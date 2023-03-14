@@ -1,6 +1,7 @@
 {
     "name": "reviewbot",
     "scripts": {
+        "prepare": "husky install",
         "dev": "npm run dev --workspaces",
         "lint": "npm run lint --workspaces",
         "lint:fix": "npm run lint:fix --workspaces"
@@ -10,6 +11,9 @@
         "github-app"
     ],
     "dependencies": {
+        "@commitlint/cli": "^17.4.4",
+        "@commitlint/config-conventional": "^17.4.4",
+        "husky": "^8.0.3",
         "parse-git-patch": "^1.1.0",
         "pino-pretty": "^9.4.0"
     }
