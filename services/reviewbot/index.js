@@ -1,9 +1,9 @@
-import promptEngine from "../services/prompt-engine.js";
-import suggestions from "../services/suggestions.js";
+import promptEngine from "./prompt-engine.js";
+import suggestions from "./suggestions.js";
 
-export default async function review(fastify) {
-  fastify.post("/review", {}, async (request, reply) => {
-    const prompts = promptEngine.build(request.body);
+const reviewBotService = {
+  createSuggestions: async function createSuggestions(gitDiff) {
+    const prompts = promptEngine.build(gitDiff);
     const response = await Promise.all(
       prompts.map(async (file) => {
         let suggestionsForFile = {};
@@ -25,7 +25,8 @@ export default async function review(fastify) {
         return suggestionsForFile;
       })
     );
+    return response;
+  },
+};
 
-    return reply.status(200).send(response);
-  });
-}
+export default reviewBotService;

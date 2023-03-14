@@ -25,13 +25,13 @@ const promptEngine = {
   },
   enhanceWithPromptContext(change) {
     const promptContext = `
-      You will take in a git diff, and tell the user what they could have improved (like a code review)
-      based on analyzing the git diff in order to see whats changed.
-      The language in the snippet is JavaScript.
-      Feel free to provide any examples as markdown code snippets in your answer.
-
-      ${change}
-    `;
+        You will take in a git diff, and tell the user what they could have improved (like a code review)
+        based on analyzing the git diff in order to see whats changed.
+        The language in the snippet is JavaScript.
+        Feel free to provide any examples as markdown code snippets in your answer.
+  
+        ${change}
+      `;
     return [
       {
         role: "system",
