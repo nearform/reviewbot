@@ -16,10 +16,10 @@ npm start
 
 ```sh
 # 1. Build container
-docker build -t reviewbot .
+docker build -t reviewbot-gha .
 
 # 2. Start container
-docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> reviewbot
+docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> reviewbot-gha
 ```
 
 ## Contributing

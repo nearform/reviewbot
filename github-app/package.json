@@ -12,10 +12,12 @@
     "probot-app"
   ],
   "scripts": {
-    "dev": "node --watch ./index.js"
+    "dev": "node --watch index.js",
+    "start": "node index.js"
   },
   "dependencies": {
-    "probot": "^12.2.4"
+    "probot": "^12.2.4",
+    "parse-git-patch": "^1.1.0"
   },
   "devDependencies": {
     "smee-client": "^1.2.2"

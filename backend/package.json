@@ -20,6 +20,7 @@
   "homepage": "https://github.com/richiemccoll/reviewbot#readme",
   "dependencies": {
     "dotenv": "^16.0.3",
-    "fastify": "^4.14.1"
+    "fastify": "^4.14.1",
+    "pino-pretty": "^10.0.0"
   }
 }
