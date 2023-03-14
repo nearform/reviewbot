@@ -1,7 +1,9 @@
 {
     "name": "reviewbot",
     "scripts": {
-        "dev": "npm run dev --workspaces"
+        "dev": "npm run dev --workspaces",
+        "lint": "npm run lint --workspaces",
+        "lint:fix": "npm run lint:fix --workspaces"
     },
     "workspaces": [
         "backend",
