@@ -1,14 +1,51 @@
 {
     "name": "reviewbot",
-    "scripts": {
-        "dev": "npm run dev --workspaces"
-    },
-    "workspaces": [
-        "backend",
-        "github-app"
+    "version": "1.0.0",
+    "private": true,
+    "description": "A bot to assist with code reviews via AI.",
+    "author": "richiemccoll",
+    "type": "module",
+    "homepage": "https://github.com/nearform/reviewbot",
+    "keywords": [
+        "probot",
+        "github",
+        "probot-app"
     ],
+    "scripts": {
+        "prepare": "husky install",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "dev": "node --watch index.js",
+        "debug": "node --inspect-brk index.js",
+        "start": "node index.js"
+    },
     "dependencies": {
         "parse-git-patch": "^1.1.0",
-        "pino-pretty": "^9.4.0"
+        "probot": "^12.2.4"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^17.4.4",
+        "@commitlint/config-conventional": "^17.4.4",
+        "eslint": "^8.35.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "husky": "^8.0.3",
+        "lint-staged": "^13.2.0",
+        "prettier": "^2.8.4",
+        "smee-client": "^1.2.2"
+    },
+    "engines": {
+        "node": ">= 10.13.0"
+    },
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nearform/reviewbot.git"
+    },
+    "bugs": {
+        "url": "https://github.com/nearform/reviewbot/issues"
+    },
+    "lint-staged": {
+        "*.js": "eslint --cache --fix"
     }
 }

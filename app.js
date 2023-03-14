@@ -1,10 +1,11 @@
-const parseGitPatch = require("parse-git-patch").default;
+import parseGitPatch from "parse-git-patch";
+import reviewBotService from "./services/reviewbot/index.js";
 
 /**
  * This is the main entrypoint to the Probot app
  * @param {import('probot').Probot} app
  */
-module.exports = async (app) => {
+export default async (app) => {
   app.log.info("[reviewbot] - server started");
 
   /*  For the MVP, it's fine to just listen for this event.
@@ -51,26 +52,14 @@ module.exports = async (app) => {
         },
       });
 
-      const { files, hash } = parseGitPatch(diff);
+      const { files, hash } = parseGitPatch.default(diff);
 
       app.log.info("[reviewbot] - scheduling review request");
 
-      const response = await fetch(process.env.REVIEWBOT_SERVICE, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(files),
-      });
+      const filesWithSuggestions = await reviewBotService.createSuggestions(
+        files
+      );
 
-      if (response.status !== 200) {
-        app.log.error("[reviewbot] - error scheduling review request");
-        throw new Error(
-          `received status code ${response.status} instead of 200`
-        );
-      }
-
-      const filesWithSuggestions = await response.json();
       const comments = filesWithSuggestions.map((f) => {
         return context.octokit.pulls.createReviewComment({
           ...common,

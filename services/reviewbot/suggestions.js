@@ -1,7 +1,3 @@
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
 const suggestions = {
   async callChatGPTService(payload) {
     const apiUrl = "https://api.openai.com/v1/chat/completions";
