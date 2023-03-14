@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "dev": "node --watch index.js",
+    "debug": "node --inspect-brk index.js",
     "start": "node index.js"
   },
   "dependencies": {
