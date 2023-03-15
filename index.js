@@ -1,4 +1,3 @@
-import { run } from "probot";
-import app from "./app.js";
+import webhookHandler from "./services/webhookFunction.js";
 
-run(app);
+export const webhook = webhookHandler;

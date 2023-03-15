@@ -1,0 +1,26 @@
+name: cd
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  call-deploy-development:
+    uses: ./.github/workflows/deploy-step.yml
+    with:
+      environment: dev
+      WEBHOOK_PATH: webhook-dev
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GH_APP_ID: ${{ vars.DEV_GH_APP_ID }}
+    secrets:
+      GH_PRIVATE_KEY: ${{ secrets.DEV_GH_PRIVATE_KEY }}
+      GH_WEBHOOK_SECRET: ${{ secrets.DEV_GH_WEBHOOK_SECRET }}
+      CHAT_GPT_API_KEY: ${{ secrets.DEV_CHAT_GPT_API_KEY }}
