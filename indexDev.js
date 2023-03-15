@@ -1,4 +1,4 @@
-import { run } from "probot";
-import app from "./services/webhookApp.js";
+import { run } from 'probot'
+import app from './services/webhookApp.js'
 
-run(app);
+run(app)

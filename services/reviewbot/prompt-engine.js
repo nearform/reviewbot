@@ -1,27 +1,27 @@
 const promptEngine = {
   filterOnlyModified(files) {
-    return files.map((file) => ({
+    return files.map(file => ({
       ...file,
-      modifiedLines: file.modifiedLines.filter((line) => line.added),
-    }));
+      modifiedLines: file.modifiedLines.filter(line => line.added)
+    }))
   },
   groupByLineRange({ modifiedLines }) {
-    const output = [];
-    let range = { start: 0, end: 0 };
-    let diff = "";
+    const output = []
+    let range = { start: 0, end: 0 }
+    let diff = ''
     for (let i = 0; i < modifiedLines.length; i++) {
-      const { lineNumber, line } = modifiedLines[i];
+      const { lineNumber, line } = modifiedLines[i]
       if (range.start === 0) {
-        range.start = lineNumber;
-        range.end = lineNumber;
-        diff += line.trim();
+        range.start = lineNumber
+        range.end = lineNumber
+        diff += line.trim()
       } else if (lineNumber === range.end + 1) {
-        range.end = lineNumber;
-        diff += line.trim();
+        range.end = lineNumber
+        diff += line.trim()
       }
     }
-    output.push({ range, diff });
-    return output;
+    output.push({ range, diff })
+    return output
   },
   enhanceWithPromptContext(change) {
     const promptContext = `
@@ -31,28 +31,28 @@ const promptEngine = {
         Feel free to provide any examples as markdown code snippets in your answer.
   
         ${change}
-      `;
+      `
     return [
       {
-        role: "system",
-        content: `You are are a senior software engineer and an emphathetic code reviewer.`,
+        role: 'system',
+        content: `You are are a senior software engineer and an emphathetic code reviewer.`
       },
-      { role: "user", content: promptContext },
-    ];
+      { role: 'user', content: promptContext }
+    ]
   },
   build(payload) {
-    const filesWithModifiedLines = this.filterOnlyModified(payload);
-    const result = filesWithModifiedLines.map((file) => {
+    const filesWithModifiedLines = this.filterOnlyModified(payload)
+    const result = filesWithModifiedLines.map(file => {
       return {
         fileName: file.afterName,
-        changes: this.groupByLineRange(file).map((change) => ({
+        changes: this.groupByLineRange(file).map(change => ({
           ...change,
-          prompt: this.enhanceWithPromptContext(change.diff),
-        })),
-      };
-    });
-    return result;
-  },
-};
+          prompt: this.enhanceWithPromptContext(change.diff)
+        }))
+      }
+    })
+    return result
+  }
+}
 
-export default promptEngine;
+export default promptEngine
