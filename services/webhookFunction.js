@@ -1,6 +1,8 @@
 import { createNodeMiddleware, createProbot } from "probot";
 
-const app = require("./webhookApp.js");
+import app from "./webhookApp.js";
 
-export const webhook = (req, res) =>
+const webhook = (req, res) =>
   createNodeMiddleware(app, { probot: createProbot() })(req, res);
+
+export default webhook;
