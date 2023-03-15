@@ -50,7 +50,7 @@ jobs:
         with:
           project_id: ${{ inputs.GCP_PROJECT_ID }}
 
-      - name: Update snooze-bot secrets in GCP Secret Manager
+      - name: Update secrets in GCP Secret Manager
         run: |
           printf -- "${{ secrets.GH_PRIVATE_KEY }}"    | gcloud secrets versions add reviewbot-github-private-key-${{ inputs.environment }} --data-file=-
           printf -- "${{ secrets.GH_WEBHOOK_SECRET }}" | gcloud secrets versions add reviewbot-github-webhook-secret-${{ inputs.environment }} --data-file=-
@@ -66,8 +66,8 @@ jobs:
           --entry-point=webhook
           --set-secrets=PRIVATE_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/reviewbot-github-private-key-${{ inputs.environment }}:latest
           --set-secrets=WEBHOOK_SECRET=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/reviewbot-github-webhook-secret-${{ inputs.environment }}:latest
+          --set-secrets=CHAT_GPT_API_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/reviewbot-chat-gpt-api-key-${{ inputs.environment }}:latest
           --set-env-vars=APP_ID="${{ inputs.GH_APP_ID }}"
-          --set-env-vars=CHAT_GPT_API_KEY="${{ inputs.CHAT_GPT_API_KEY }}"
           --trigger-http
           --allow-unauthenticated
           --region=us-central1
