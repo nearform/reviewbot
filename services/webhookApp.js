@@ -1,5 +1,6 @@
 import parseGitPatch from 'parse-git-patch'
-import reviewBotService from './reviewbot/index.js'
+import createReview from './reviewbot/index.js'
+import { findLinePositionInDiff } from './utils.js'
 
 /**
  * This is the main entrypoint to the Probot app
@@ -10,7 +11,6 @@ export default async app => {
 
   /*  For the MVP, it's fine to just listen for this event.
       In the future, we would want to handle different scenarios such as:
-      - issue_comment.edited
       - pull_request_review_comment.created
       - pull_request_review_comment.edited */
 
@@ -53,30 +53,38 @@ export default async app => {
         }
       })
 
-      const { files, hash } = parseGitPatch.default(diff)
+      const { files } = parseGitPatch.default(diff)
 
       // push event on topic...
       console.log('[reviewbot] - scheduling review request')
 
-      const filesWithSuggestions = await reviewBotService.createSuggestions([
-        files[0]
-      ])
+      const filesWithSuggestions = await createReview(files)
 
-      const comments = filesWithSuggestions.map(f => {
-        return context.octokit.pulls.createReviewComment({
-          ...common,
-          pull_number: pullRequest.pull_number,
-          path: f.filename,
-          body: f.suggestions,
-          start_line: f.lineRange.start,
-          // line === end line when using multi line comments
-          line: f.lineRange.end,
-          start_side: 'RIGHT',
-          commit_id: hash
-        })
+      const comments = filesWithSuggestions.map(f => ({
+        path: f.filename,
+        position: findLinePositionInDiff(diff, f.filename, f.lineRange.start),
+        body: f.suggestions
+      }))
+
+      const commits = await context.octokit.pulls.listCommits({
+        ...common,
+        pull_number: pullRequest.pull_number
       })
-      await Promise.all(comments)
+
+      const latestCommit = commits[commits.length - 1]
+
+      await context.octokit.rest.pulls.createReview({
+        ...common,
+        pull_number: pullRequest.pull_number,
+        commit_id: latestCommit,
+        body: 'Please take a look at my comments.',
+        event: 'COMMENT',
+        comments
+      })
+
+      console.log('[reviewbot] - review finished')
     } catch (error) {
+      console.error(error)
       console.error(`[reviewbot] - encountered an error - ${error.message}`)
     }
   })
