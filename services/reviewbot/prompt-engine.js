@@ -51,6 +51,7 @@ const promptEngine = {
         }))
       }
     })
+    console.log('[reviewbot] - building prompts', result)
     return result
   }
 }

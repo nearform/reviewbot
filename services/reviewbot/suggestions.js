@@ -30,7 +30,7 @@ const suggestions = {
             this.callChatGPTService(file.prompt)
           )
           const suggestions = await Promise.all(prompts)
-
+          console.log('[reviewbot] - getting suggestions', suggestions)
           return this._formatResponse(suggestions)
         } catch (error) {
           throw new Error(`received error from chatGPT API + ${error.message}`)

@@ -16,8 +16,8 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "start": "probot run ./services/reviewbot/app.js",
-        "dev": "node --watch index.js",
-        "debug": "node --inspect-brk index.js"
+        "dev": "node --watch indexDev.js",
+        "debug": "node --inspect-brk indexDev.js"
     },
     "dependencies": {
         "parse-git-patch": "^1.1.0",

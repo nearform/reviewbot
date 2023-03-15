@@ -6,7 +6,7 @@ import reviewBotService from './reviewbot/index.js'
  * @param {import('probot').Probot} app
  */
 export default async app => {
-  app.log.info('[reviewbot] - server started')
+  console.log('[reviewbot] - server started')
 
   /*  For the MVP, it's fine to just listen for this event.
       In the future, we would want to handle different scenarios such as:
@@ -14,17 +14,13 @@ export default async app => {
       - pull_request_review_comment.created
       - pull_request_review_comment.edited */
 
-  app.on('issue_comment.created', async context => {
-    if (context.payload.sender.login === 'reviewbot-ai[bot]') {
-      return
-    }
-
+  app.on(['issue_comment'], async context => {
     try {
       const issue = context.issue()
-      const { body } = context.payload.comment
-      const common = {
-        owner: issue.owner,
-        repo: issue.repo
+      const { body, user } = context.payload.comment
+
+      if (user.type === 'Bot') {
+        return
       }
 
       const botCall = '/reviewbot review'
@@ -32,7 +28,12 @@ export default async app => {
         return
       }
 
-      app.log.info('[reviewbot] - ack author comment')
+      const common = {
+        owner: issue.owner,
+        repo: issue.repo
+      }
+
+      console.log('[reviewbot] - ack author comment')
 
       await context.octokit.reactions.createForIssueComment({
         content: 'eyes',
@@ -40,8 +41,7 @@ export default async app => {
         ...common
       })
 
-      // push event on topic...
-      app.log.info('[reviewbot] - getting git diff for files changed')
+      console.log('[reviewbot] - getting git diff for files changed')
 
       const pullRequest = context.pullRequest()
 
@@ -55,11 +55,12 @@ export default async app => {
 
       const { files, hash } = parseGitPatch.default(diff)
 
-      app.log.info('[reviewbot] - scheduling review request')
+      // push event on topic...
+      console.log('[reviewbot] - scheduling review request')
 
-      const filesWithSuggestions = await reviewBotService.createSuggestions(
-        files
-      )
+      const filesWithSuggestions = await reviewBotService.createSuggestions([
+        files[0]
+      ])
 
       const comments = filesWithSuggestions.map(f => {
         return context.octokit.pulls.createReviewComment({
@@ -76,7 +77,7 @@ export default async app => {
       })
       await Promise.all(comments)
     } catch (error) {
-      app.log.error(`[reviewbot] - encountered an error - ${error.message}`)
+      console.error(`[reviewbot] - encountered an error - ${error.message}`)
     }
   })
 }
