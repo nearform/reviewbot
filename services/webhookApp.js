@@ -1,5 +1,5 @@
 import parseGitPatch from "parse-git-patch";
-import reviewBotService from "./services/reviewbot/index.js";
+import reviewBotService from "./reviewbot/index.js";
 
 /**
  * This is the main entrypoint to the Probot app
@@ -40,6 +40,7 @@ export default async (app) => {
         ...common,
       });
 
+      // push event on topic...
       app.log.info("[reviewbot] - getting git diff for files changed");
 
       const pullRequest = context.pullRequest();

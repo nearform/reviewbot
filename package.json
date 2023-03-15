@@ -12,12 +12,12 @@
         "probot-app"
     ],
     "scripts": {
-        "prepare": "husky install",
+        "prepare": "npx husky install",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
+        "start": "probot run ./services/reviewbot/app.js",
         "dev": "node --watch index.js",
-        "debug": "node --inspect-brk index.js",
-        "start": "node index.js"
+        "debug": "node --inspect-brk index.js"
     },
     "dependencies": {
         "parse-git-patch": "^1.1.0",
