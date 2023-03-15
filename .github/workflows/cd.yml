@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - chore/continuous-deploy
   workflow_dispatch:
 
 permissions:

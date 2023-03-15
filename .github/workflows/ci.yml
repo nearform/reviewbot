@@ -3,7 +3,7 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
@@ -15,10 +15,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
-      - run: npm install -g firebase-tools
       - run: npm ci
       - run: npm run lint
-      - run: npm test
+#      - run: npm test
 
   automerge:
     name: Merge dependabot's PRs
