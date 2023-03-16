@@ -67,11 +67,13 @@ export default async app => {
         pull_number: pullRequest.pull_number
       })
 
+      console.log('list of commits', commits)
+
       const latestCommit = commits[commits.length - 1]
 
       if (!latestCommit) {
         console.error('[reviewbot] - could not find latest commit')
-        return
+        // return
       }
 
       // push event on topic...
