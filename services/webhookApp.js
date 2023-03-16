@@ -67,13 +67,15 @@ export default async app => {
         pull_number: pullRequest.pull_number
       })
 
-      console.log('list of commits', commits)
+      const shaList = commits.map(c => c.sha)
 
-      const latestCommit = commits[commits.length - 1]
+      console.log('[reviewbot] -list commits', shaList)
+
+      const latestCommit = shaList[shaList.length - 1]
 
       if (!latestCommit) {
         console.error('[reviewbot] - could not find latest commit')
-        // return
+        return
       }
 
       // push event on topic...
@@ -92,7 +94,7 @@ export default async app => {
       await context.octokit.rest.pulls.createReview({
         ...common,
         pull_number: pullRequest.pull_number,
-        commit_id: 'e93402bcf21f5d1b454c0367f5474a281827d498',
+        commit_id: latestCommit,
         body: 'Please take a look at my comments.',
         event: 'COMMENT',
         comments
