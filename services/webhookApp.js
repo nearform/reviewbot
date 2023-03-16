@@ -67,9 +67,16 @@ export default async app => {
         pull_number: pullRequest.pull_number
       })
 
+      if (!Array.isArray(commits) || commits.length === 0) {
+        console.error(
+          `[reviewbot] - could not find list of commits for pull request ${pullRequest.pull_number}`
+        )
+        return
+      }
+
       const shaList = commits.map(c => c.sha)
 
-      console.log('[reviewbot] -list commits', shaList)
+      console.log('[reviewbot] - list commits', shaList)
 
       const latestCommit = shaList[shaList.length - 1]
 
