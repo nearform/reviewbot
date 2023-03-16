@@ -8,6 +8,9 @@
  * @returns {number} The position of the specified line in the diff, or -1 if not found.
  */
 const findLinePositionInDiff = (diff, filename, lineNumber) => {
+  if (!diff) {
+    return -1
+  }
   const lines = diff.split('\n')
   let position = 0
   let currentFile = null
