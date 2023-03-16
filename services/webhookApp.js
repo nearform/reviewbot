@@ -1,3 +1,4 @@
+import path from 'node:path'
 import parseGitPatch from 'parse-git-patch'
 import createReview from './reviewbot/index.js'
 import { findLinePositionInDiff } from './utils.js'
@@ -55,10 +56,16 @@ export default async app => {
 
       const { files } = parseGitPatch.default(diff)
 
+      const filteredFiles = files.filter(
+        f =>
+          path.extname(f.afterName) === '.js' ||
+          path.extname(f.afterName) === '.ts'
+      )
+
       // push event on topic...
       console.log('[reviewbot] - scheduling review request')
 
-      const filesWithSuggestions = await createReview(files)
+      const filesWithSuggestions = await createReview(filteredFiles)
 
       const comments = filesWithSuggestions.map(f => ({
         path: f.filename,
