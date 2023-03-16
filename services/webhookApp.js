@@ -69,6 +69,11 @@ export default async app => {
 
       const latestCommit = commits[commits.length - 1]
 
+      if (!latestCommit) {
+        console.error('[reviewbot] - could not find latest commit')
+        return
+      }
+
       // push event on topic...
       console.log('[reviewbot] - scheduling review request')
 
@@ -85,7 +90,7 @@ export default async app => {
       await context.octokit.rest.pulls.createReview({
         ...common,
         pull_number: pullRequest.pull_number,
-        commit_id: 'ea596d273b6d33cadfdc7db805cd17ae8e9669a5',
+        commit_id: 'e93402bcf21f5d1b454c0367f5474a281827d498',
         body: 'Please take a look at my comments.',
         event: 'COMMENT',
         comments
