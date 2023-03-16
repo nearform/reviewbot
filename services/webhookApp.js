@@ -62,6 +62,13 @@ export default async app => {
           path.extname(f.afterName) === '.ts'
       )
 
+      const commits = await context.octokit.pulls.listCommits({
+        ...common,
+        pull_number: pullRequest.pull_number
+      })
+
+      const latestCommit = commits[commits.length - 1]
+
       // push event on topic...
       console.log('[reviewbot] - scheduling review request')
 
@@ -73,17 +80,12 @@ export default async app => {
         body: f.suggestions
       }))
 
-      const commits = await context.octokit.pulls.listCommits({
-        ...common,
-        pull_number: pullRequest.pull_number
-      })
-
-      const latestCommit = commits[commits.length - 1]
+      console.log(`[reviewbot] - creating review for commit ${latestCommit}`)
 
       await context.octokit.rest.pulls.createReview({
         ...common,
         pull_number: pullRequest.pull_number,
-        commit_id: latestCommit,
+        commit_id: 'ea596d273b6d33cadfdc7db805cd17ae8e9669a5',
         body: 'Please take a look at my comments.',
         event: 'COMMENT',
         comments
