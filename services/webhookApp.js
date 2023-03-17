@@ -1,6 +1,5 @@
-import path from 'node:path'
 import parseGitPatch from 'parse-git-patch'
-import createReview from './reviewbot/index.js'
+import createSuggestions from './reviewbot/index.js'
 import { findLinePositionInDiff } from './utils.js'
 
 /**
@@ -56,12 +55,6 @@ export default async app => {
 
       const { files } = parseGitPatch.default(diff)
 
-      const filteredFiles = files.filter(
-        f =>
-          path.extname(f.afterName) === '.js' ||
-          path.extname(f.afterName) === '.ts'
-      )
-
       const commits = await context.octokit.pulls.listCommits({
         ...common,
         pull_number: pullRequest.pull_number
@@ -88,7 +81,7 @@ export default async app => {
       // push event on topic...
       console.log('[reviewbot] - scheduling review request')
 
-      const filesWithSuggestions = await createReview(filteredFiles)
+      const filesWithSuggestions = await createSuggestions(files)
 
       const comments = filesWithSuggestions.map(f => ({
         path: f.filename,

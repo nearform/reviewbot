@@ -29,6 +29,9 @@ async function createSuggestions({ transformerType, payload }) {
     case 'chatGPT': {
       try {
         const prompts = payload.map(file => callChatGPTService(file.prompt))
+        if (prompts.length === 0) {
+          return []
+        }
         const suggestions = await Promise.all(prompts)
         console.log('[reviewbot] - getting suggestions', suggestions)
         return suggestions.map(s =>

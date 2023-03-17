@@ -1,8 +1,18 @@
+import path from 'node:path'
+
 function filterOnlyModified(files) {
   return files.map(file => ({
     ...file,
     modifiedLines: file.modifiedLines.filter(line => line.added)
   }))
+}
+
+function filterAcceptedFiles(files) {
+  const filteredFiles = files.filter(
+    f =>
+      path.extname(f.afterName) === '.js' || path.extname(f.afterName) === '.ts'
+  )
+  return filteredFiles
 }
 
 function groupByLineRange({ modifiedLines }) {
@@ -48,7 +58,8 @@ function enhanceWithPromptContext(change) {
   @returns {Object[]} - An array of objects containing file names and an array of changes with prompts for each file.
 **/
 function buildPrompt(payload) {
-  const filesWithModifiedLines = filterOnlyModified(payload)
+  const acceptedFiles = filterAcceptedFiles(payload)
+  const filesWithModifiedLines = filterOnlyModified(acceptedFiles)
   const result = filesWithModifiedLines.map(file => {
     return {
       fileName: file.afterName,
