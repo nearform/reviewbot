@@ -1,4 +1,20 @@
 const suggestions = {
+    async create({ transformerType, payload }) {
+    switch (transformerType) {
+      case 'chatGPT': {
+        try {
+          const prompts = payload.map(file =>
+            this.callChatGPTService(file.prompt)
+          )
+          const suggestions = await Promise.all(prompts)
+
+          return this._formatResponse(suggestions)
+        } catch (error) {
+          throw new Error(`received error from chatGPT API + ${error.message}`)
+        }
+      }
+    }
+  },
   async callChatGPTService(payload) {
     const apiUrl = 'https://api.openai.com/v1/chat/completions'
     const response = await fetch(apiUrl, {
@@ -22,22 +38,6 @@ const suggestions = {
       s.choices.map(choice => choice.message.content.trim()).join('')
     )
   },
-  async create({ transformerType, payload }) {
-    switch (transformerType) {
-      case 'chatGPT': {
-        try {
-          const prompts = payload.map(file =>
-            this.callChatGPTService(file.prompt)
-          )
-          const suggestions = await Promise.all(prompts)
-
-          return this._formatResponse(suggestions)
-        } catch (error) {
-          throw new Error(`received error from chatGPT API + ${error.message}`)
-        }
-      }
-    }
-  }
 }
 
 export default suggestions

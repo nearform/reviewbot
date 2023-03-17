@@ -1,10 +1,4 @@
 const promptEngine = {
-  filterOnlyModified(files) {
-    return files.map(file => ({
-      ...file,
-      modifiedLines: file.modifiedLines.filter(line => line.added)
-    }))
-  },
   groupByLineRange({ modifiedLines }) {
     const output = []
     let range = { start: 0, end: 0 }
@@ -22,6 +16,12 @@ const promptEngine = {
     }
     output.push({ range, diff })
     return output
+  },
+  filterOnlyModified(files) {
+    return files.map(file => ({
+      ...file,
+      modifiedLines: file.modifiedLines.filter(line => line.added)
+    }))
   },
   enhanceWithPromptContext(change) {
     const promptContext = `
