@@ -61,6 +61,7 @@ export default async app => {
       })
 
       if (!Array.isArray(commits) || commits.length === 0) {
+        console.log(commits)
         console.error(
           `[reviewbot] - could not find list of commits for pull request ${pullRequest.pull_number}`
         )
