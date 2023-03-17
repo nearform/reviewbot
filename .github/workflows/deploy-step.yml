@@ -60,7 +60,6 @@ jobs:
         id: deploy-webhook
         run: >-
           gcloud functions deploy ${{ inputs.WEBHOOK_PATH }}
-          --project="${{ inputs.GCP_PROJECT_ID }}"
           --runtime=nodejs18
           --source=.
           --entry-point=webhook
