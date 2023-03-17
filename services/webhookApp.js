@@ -55,7 +55,7 @@ export default async app => {
 
       const { files } = parseGitPatch.default(diff)
 
-      const commits = await context.octokit.pulls.listCommits({
+      const { data: commits } = await context.octokit.pulls.listCommits({
         ...common,
         pull_number: pullRequest.pull_number
       })
