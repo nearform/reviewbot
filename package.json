@@ -16,8 +16,10 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "start": "probot run ./services/reviewbot/app.js",
-        "dev": "node --watch index.js",
-        "debug": "node --inspect-brk index.js"
+        "dev": "node --watch indexDev.js",
+        "debug": "node --inspect-brk indexDev.js",
+        "test": "node --test tests/",
+        "test:watch": "node --test --watch tests/"
     },
     "dependencies": {
         "parse-git-patch": "^1.1.0",
@@ -29,6 +31,7 @@
         "eslint": "^8.35.0",
         "eslint-config-prettier": "^8.6.0",
         "eslint-plugin-prettier": "^4.2.1",
+        "fetch-mock": "^9.11.0",
         "husky": "^8.0.3",
         "lint-staged": "^13.2.0",
         "prettier": "^2.8.4",

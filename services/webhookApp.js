@@ -1,30 +1,26 @@
 import parseGitPatch from 'parse-git-patch'
-import reviewBotService from './reviewbot/index.js'
+import createSuggestions from './reviewbot/index.js'
+import { findLinePositionInDiff } from './utils.js'
 
 /**
  * This is the main entrypoint to the Probot app
  * @param {import('probot').Probot} app
  */
 export default async app => {
-  app.log.info('[reviewbot] - server started')
+  console.log('[reviewbot] - server started')
 
   /*  For the MVP, it's fine to just listen for this event.
       In the future, we would want to handle different scenarios such as:
-      - issue_comment.edited
       - pull_request_review_comment.created
       - pull_request_review_comment.edited */
 
-  app.on('issue_comment.created', async context => {
-    if (context.payload.sender.login === 'reviewbot-ai[bot]') {
-      return
-    }
-
+  app.on(['issue_comment'], async context => {
     try {
       const issue = context.issue()
-      const { body } = context.payload.comment
-      const common = {
-        owner: issue.owner,
-        repo: issue.repo
+      const { body, user } = context.payload.comment
+
+      if (user.type === 'Bot') {
+        return
       }
 
       const botCall = '/reviewbot review'
@@ -32,7 +28,12 @@ export default async app => {
         return
       }
 
-      app.log.info('[reviewbot] - ack author comment')
+      const common = {
+        owner: issue.owner,
+        repo: issue.repo
+      }
+
+      console.log('[reviewbot] - ack author comment')
 
       await context.octokit.reactions.createForIssueComment({
         content: 'eyes',
@@ -40,8 +41,7 @@ export default async app => {
         ...common
       })
 
-      // push event on topic...
-      app.log.info('[reviewbot] - getting git diff for files changed')
+      console.log('[reviewbot] - getting git diff for files changed')
 
       const pullRequest = context.pullRequest()
 
@@ -53,30 +53,58 @@ export default async app => {
         }
       })
 
-      const { files, hash } = parseGitPatch.default(diff)
+      const { files } = parseGitPatch.default(diff)
 
-      app.log.info('[reviewbot] - scheduling review request')
-
-      const filesWithSuggestions = await reviewBotService.createSuggestions(
-        files
-      )
-
-      const comments = filesWithSuggestions.map(f => {
-        return context.octokit.pulls.createReviewComment({
-          ...common,
-          pull_number: pullRequest.pull_number,
-          path: f.filename,
-          body: f.suggestions,
-          start_line: f.lineRange.start,
-          // line === end line when using multi line comments
-          line: f.lineRange.end,
-          start_side: 'RIGHT',
-          commit_id: hash
-        })
+      const { data: commits } = await context.octokit.pulls.listCommits({
+        ...common,
+        pull_number: pullRequest.pull_number
       })
-      await Promise.all(comments)
+
+      if (!Array.isArray(commits) || commits.length === 0) {
+        console.log(commits)
+        console.error(
+          `[reviewbot] - could not find list of commits for pull request ${pullRequest.pull_number}`
+        )
+        return
+      }
+
+      const shaList = commits.map(c => c.sha)
+
+      console.log('[reviewbot] - list commits', shaList)
+
+      const latestCommit = shaList[shaList.length - 1]
+
+      if (!latestCommit) {
+        console.error('[reviewbot] - could not find latest commit')
+        return
+      }
+
+      // push event on topic...
+      console.log('[reviewbot] - scheduling review request')
+
+      const filesWithSuggestions = await createSuggestions(files)
+
+      const comments = filesWithSuggestions.map(f => ({
+        path: f.filename,
+        position: findLinePositionInDiff(diff, f.filename, f.lineRange.start),
+        body: f.suggestions
+      }))
+
+      console.log(`[reviewbot] - creating review for commit ${latestCommit}`)
+
+      await context.octokit.rest.pulls.createReview({
+        ...common,
+        pull_number: pullRequest.pull_number,
+        commit_id: latestCommit,
+        body: 'Please take a look at my comments.',
+        event: 'COMMENT',
+        comments
+      })
+
+      console.log('[reviewbot] - review finished')
     } catch (error) {
-      app.log.error(`[reviewbot] - encountered an error - ${error.message}`)
+      console.error(error)
+      console.error(`[reviewbot] - encountered an error - ${error.message}`)
     }
   })
 }
