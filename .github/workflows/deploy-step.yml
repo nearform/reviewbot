@@ -51,10 +51,12 @@ jobs:
           project_id: ${{ inputs.GCP_PROJECT_ID }}
 
       - name: Update secrets in GCP Secret Manager
-        run: |
-          printf -- "${{ secrets.GH_PRIVATE_KEY }}"    | gcloud secrets versions add reviewbot-github-private-key-${{ inputs.environment }} --data-file=-
-          printf -- "${{ secrets.GH_WEBHOOK_SECRET }}" | gcloud secrets versions add reviewbot-github-webhook-secret-${{ inputs.environment }} --data-file=-
-          printf -- "${{ secrets.CHAT_GPT_API_KEY }}" | gcloud secrets versions add reviewbot-chat-gpt-api-key-${{ inputs.environment }} --data-file=-
+        uses: nearform-actions/github-action-gcp-secrets@v1
+        with:
+          secrets: |-
+            gh-private-key-${{ inputs.environment }}:"${{ secrets.GH_PRIVATE_KEY }}"
+            gh-webhook-secret-${{ inputs.environment }}:"${{ secrets.GH_WEBHOOK_SECRET }}"
+            chat-gpt-api-key-${{ inputs.environment }}:"${{ secrets.CHAT_GPT_API_KEY }}"
 
       - name: 'Deploy webhook to Cloud Run'
         id: deploy-webhook
@@ -63,9 +65,9 @@ jobs:
           --runtime=nodejs18
           --source=.
           --entry-point=webhook
-          --set-secrets=PRIVATE_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/reviewbot-github-private-key-${{ inputs.environment }}:latest
-          --set-secrets=WEBHOOK_SECRET=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/reviewbot-github-webhook-secret-${{ inputs.environment }}:latest
-          --set-secrets=CHAT_GPT_API_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/reviewbot-chat-gpt-api-key-${{ inputs.environment }}:latest
+          --set-secrets=PRIVATE_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/gh-private-key-${{ inputs.environment }}:latest
+          --set-secrets=WEBHOOK_SECRET=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/gh-webhook-secret-${{ inputs.environment }}:latest
+          --set-secrets=CHAT_GPT_API_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/chat-gpt-api-key-${{ inputs.environment }}:latest
           --set-env-vars=APP_ID="${{ inputs.GH_APP_ID }}"
           --trigger-http
           --allow-unauthenticated
