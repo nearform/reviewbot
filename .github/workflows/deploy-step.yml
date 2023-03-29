@@ -16,6 +16,9 @@ on:
       GH_APP_ID:
         required: true
         type: string
+      TOPIC_NAME:
+        required: true
+        type: string
       WEBHOOK_PATH:
         required: true
         type: string
@@ -67,8 +70,9 @@ jobs:
           --entry-point=webhook
           --set-secrets=PRIVATE_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/gh-private-key-${{ inputs.environment }}:latest
           --set-secrets=WEBHOOK_SECRET=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/gh-webhook-secret-${{ inputs.environment }}:latest
-          --set-secrets=CHAT_GPT_API_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/chat-gpt-api-key-${{ inputs.environment }}:latest
           --set-env-vars=APP_ID="${{ inputs.GH_APP_ID }}"
+          --set-env-vars=PROJECT_ID="${{ inputs.GCP_PROJECT_ID }}"
+          --set-env-vars=TOPIC_NAME="${{ inputs.TOPIC_NAME }}"
           --trigger-http
           --allow-unauthenticated
           --region=us-central1

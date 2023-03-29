@@ -79,13 +79,12 @@ export default async app => {
       }
 
       const pubsub = new PubSub({
-        projectId: 'my-project',
-        apiEndpoint: process.env.PUBSUB_EMULATOR_HOST
+        projectId: process.env.PROJECT_ID,
+        apiEndpoint: process.env.PUBSUB_HOST
       })
 
-      const topicName = process.env.PUBSUB_TOPIC_NAME
       const messageId = await pubsub
-        .topic(topicName)
+        .topic(process.env.TOPIC_NAME)
         .publishMessage({ json: messageContext })
 
       console.log('[reviewbot] - ack author comment', messageId)

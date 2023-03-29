@@ -1,7 +1,7 @@
 import createSuggestions from '../create-suggestions/index.js'
 import findLinePositionInDiff from '../utils.js'
 
-export default async function processReview(context, messageContext) {
+export default async function createReview(context, messageContext) {
   console.log('[reviewbot] - scheduling review request', messageContext)
 
   const filesWithSuggestions = await createSuggestions(messageContext.files)
