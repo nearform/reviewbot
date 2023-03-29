@@ -1,3 +1,3 @@
-import webhookHandler from './services/webhookFunction.js'
+import webhookHandler from './functions/webhook/function.js'
 
 export const webhook = webhookHandler

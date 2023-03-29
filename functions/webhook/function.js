@@ -1,6 +1,6 @@
 import { createNodeMiddleware, createProbot } from 'probot'
 
-import app from './webhookApp.js'
+import app from './app.js'
 
 /**
   Middleware function that handles incoming webhooks.
