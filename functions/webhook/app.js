@@ -75,7 +75,8 @@ export default async app => {
         pull_number: pullRequest.pull_number,
         diff,
         latestCommit,
-        files
+        files,
+        installationId: context.payload.installation.id
       }
 
       const pubsub = new PubSub({
@@ -83,9 +84,14 @@ export default async app => {
         apiEndpoint: process.env.PUBSUB_HOST
       })
 
-      const messageId = await pubsub
-        .topic(process.env.TOPIC_NAME)
-        .publishMessage({ json: messageContext })
+      const topic = pubsub.topic(process.env.TOPIC_NAME)
+      const [topicExists] = await topic.exists()
+
+      if (!topicExists) {
+        await topic.create()
+      }
+
+      const messageId = await topic.publishMessage({ json: messageContext })
 
       console.log('[reviewbot] - ack author comment', messageId)
 

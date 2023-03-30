@@ -16,10 +16,13 @@ jobs:
     with:
       environment: dev
       WEBHOOK_PATH: webhook-dev
+      CREATE_REVIEW_PATH: createReview-dev
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
       GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
       GH_APP_ID: ${{ vars.DEV_GH_APP_ID }}
+      TOPIC_NAME: ${{ vars.TOPIC_NAME }}
+      SUBSCRIPTION_NAME: ${{ vars.SUBSCRIPTION_NAME }}
     secrets:
       GH_PRIVATE_KEY: ${{ secrets.DEV_GH_PRIVATE_KEY }}
       GH_WEBHOOK_SECRET: ${{ secrets.DEV_GH_WEBHOOK_SECRET }}

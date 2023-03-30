@@ -34,5 +34,5 @@ To emulate the Pub/Sub behaviour locally, we can use Docker to run the service l
 
 This will create a new Docker container with the name `pubsub-emulator`, maps the Pub/Sub emulator port 8085 to the local port 8085, and starts the Pub/Sub emulator with the `--host-port=0.0.0.0:8085` option to allow incoming connections from outside the container.
 
-Next, ensure that the `PUBSUB_EMULATOR_HOST` env variable is pointing to the local Pub/Sub emulator. See `.env.example`.
+Next, ensure that the `PUBSUB_HOST` env variable is pointing to the local Pub/Sub emulator. See `.env.example`.
 
