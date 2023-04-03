@@ -16,9 +16,8 @@ This repo contains:
 
 ##  Local Development
 
-### ngrok
-
 These steps assume you have already installed the `reviewbot` Github app on a repo.
+### ngrok
 
 There are a couple of high level steps to get local development working with [ngrok](https://ngrok.com/).
 - Run `npm run dev` to start the development `Probot` app
@@ -28,12 +27,14 @@ There are a couple of high level steps to get local development working with [ng
 
 ### gcloud
 
-To emulate the Pub/Sub behaviour locally, we can run the service locally.
+To emulate the Pub/Sub behaviour from `gcloud`, we can run some of the services locally.
 
-Before running, ensure that you have followed the steps here to install the JDK & `gcloud` CLI tool.
+Before running, ensure that you have followed the [steps here](https://cloud.google.com/pubsub/docs/emulator#before-you-begin) to install the JDK & `gcloud` CLI tool.
 
 - Open a terminal and start the emulator.
   - `gcloud beta emulators pubsub start --project=reviewbot --host-port=0.0.0.0:8829`
 - Run the dev scripts
-  - `npm run dev` (start the reviewbot webhook handler)
   - `npm run dev:pubsub` (start the pub/sub message service)
+
+To test that everything is setup correctly. Try tagging the bot in a comment on a repo where you have it installed
+  - `/reviewbot review`
