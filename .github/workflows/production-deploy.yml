@@ -14,10 +14,13 @@ jobs:
     with:
       environment: prod
       WEBHOOK_PATH: webhook-prod
+      CREATE_REVIEW_PATH: createReview-prod
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
       GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
       GH_APP_ID: ${{ vars.PROD_GH_APP_ID }}
+      TOPIC_NAME: ${{ vars.TOPIC_NAME }}
+      SUBSCRIPTION_NAME: ${{ vars.SUBSCRIPTION_NAME }}
     secrets:
       GH_PRIVATE_KEY: ${{ secrets.PROD_GH_PRIVATE_KEY }}
       GH_WEBHOOK_SECRET: ${{ secrets.PROD_GH_WEBHOOK_SECRET }}
