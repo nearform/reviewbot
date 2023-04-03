@@ -28,11 +28,12 @@ There are a couple of high level steps to get local development working with [ng
 
 ### gcloud
 
-To emulate the Pub/Sub behaviour locally, we can use Docker to run the service locally:
+To emulate the Pub/Sub behaviour locally, we can run the service locally.
 
-- `docker run --name pubsub-emulator -p 8085:8085 -d google/cloud-sdk gcloud beta emulators pubsub start --host-port=0.0.0.0:8085`
+Before running, ensure that you have followed the steps here to install the JDK & `gcloud` CLI tool.
 
-This will create a new Docker container with the name `pubsub-emulator`, maps the Pub/Sub emulator port 8085 to the local port 8085, and starts the Pub/Sub emulator with the `--host-port=0.0.0.0:8085` option to allow incoming connections from outside the container.
-
-Next, ensure that the `PUBSUB_HOST` env variable is pointing to the local Pub/Sub emulator. See `.env.example`.
-
+- Open a terminal and start the emulator.
+  - `gcloud beta emulators pubsub start --project=reviewbot --host-port=0.0.0.0:8829`
+- Run the dev scripts
+  - `npm run dev` (start the reviewbot webhook handler)
+  - `npm run dev:pubsub` (start the pub/sub message service)

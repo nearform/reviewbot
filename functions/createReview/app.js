@@ -1,10 +1,11 @@
+import * as dotenv from 'dotenv'
 import createSuggestions from './createSuggestions/index.js'
 import { findLinePositionInDiff } from '../utils.js'
 import getOctokit from './oktokit/index.js'
 
+dotenv.config()
 /**
  * Event listener function that is invoked when a new message is received.
- *
  * @param {import('@google-cloud/pubsub').Message} message - The message object.
  * @return {void}
  */

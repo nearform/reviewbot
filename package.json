@@ -17,6 +17,7 @@
         "lint:fix": "eslint . --fix",
         "start": "probot run ./functions/webhook/app.js",
         "dev": "node --watch indexDev.js",
+        "dev:pubsub": "node --watch -r dotenv/config pubsubDev.js",
         "debug": "node --inspect-brk indexDev.js",
         "test": "node --test tests/",
         "test:watch": "node --test --watch tests/"
@@ -31,6 +32,7 @@
     "devDependencies": {
         "@commitlint/cli": "^17.5.1",
         "@commitlint/config-conventional": "^17.4.4",
+        "dotenv": "^16.0.3",
         "eslint": "^8.37.0",
         "eslint-config-prettier": "^8.8.0",
         "eslint-plugin-prettier": "^4.2.1",
