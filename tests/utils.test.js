@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { findLinePositionInDiff } from '../services/utils.js'
+import { findLinePositionInDiff } from '../functions/utils.js'
 
 const testDiff = `diff --git a/example.js b/example.js
 index 1234567..abcdefg 100644

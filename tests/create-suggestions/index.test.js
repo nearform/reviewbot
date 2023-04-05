@@ -1,7 +1,7 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert'
 import fetchMock from 'fetch-mock'
-import createSuggestions from '../../services/reviewbot/index.js'
+import createSuggestions from '../../functions/createReview/createSuggestions/index.js'
 
 describe('createSuggestions()', () => {
   test('should generate a a sugggestion for a valid git diff with one file', async t => {

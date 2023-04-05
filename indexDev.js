@@ -1,4 +1,4 @@
 import { run } from 'probot'
-import app from './services/webhookApp.js'
+import app from './functions/webhook/app.js'
 
 run(app)

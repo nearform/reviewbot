@@ -15,19 +15,24 @@
         "prepare": "npx husky install",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
-        "start": "probot run ./services/reviewbot/app.js",
+        "start": "probot run ./functions/webhook/app.js",
         "dev": "node --watch indexDev.js",
+        "dev:pubsub": "node --watch -r dotenv/config pubsubDev.js",
         "debug": "node --inspect-brk indexDev.js",
         "test": "node --test tests/",
         "test:watch": "node --test --watch tests/"
     },
     "dependencies": {
+        "@google-cloud/pubsub": "^3.4.1",
+        "@octokit/auth-app": "^4.0.9",
+        "octokit": "^2.0.14",
         "parse-git-patch": "^1.1.0",
         "probot": "^12.2.4"
     },
     "devDependencies": {
         "@commitlint/cli": "^17.5.1",
         "@commitlint/config-conventional": "^17.4.4",
+        "dotenv": "^16.0.3",
         "eslint": "^8.37.0",
         "eslint-config-prettier": "^8.8.0",
         "eslint-plugin-prettier": "^4.2.1",

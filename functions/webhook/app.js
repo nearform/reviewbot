@@ -1,6 +1,5 @@
+import { PubSub } from '@google-cloud/pubsub'
 import parseGitPatch from 'parse-git-patch'
-import createSuggestions from './reviewbot/index.js'
-import { findLinePositionInDiff } from './utils.js'
 
 /**
  * This is the main entrypoint to the Probot app
@@ -16,7 +15,6 @@ export default async app => {
 
   app.on(['issue_comment'], async context => {
     try {
-      const issue = context.issue()
       const { body, user } = context.payload.comment
 
       if (user.type === 'Bot') {
@@ -28,22 +26,15 @@ export default async app => {
         return
       }
 
+      const issue = context.issue()
+      const pullRequest = context.pullRequest()
+
       const common = {
         owner: issue.owner,
         repo: issue.repo
       }
 
-      console.log('[reviewbot] - ack author comment')
-
-      await context.octokit.reactions.createForIssueComment({
-        content: 'eyes',
-        comment_id: context.payload.comment.id,
-        ...common
-      })
-
       console.log('[reviewbot] - getting git diff for files changed')
-
-      const pullRequest = context.pullRequest()
 
       const { data: diff } = await context.octokit.rest.pulls.get({
         ...common,
@@ -79,29 +70,36 @@ export default async app => {
         return
       }
 
-      // push event on topic...
-      console.log('[reviewbot] - scheduling review request')
-
-      const filesWithSuggestions = await createSuggestions(files)
-
-      const comments = filesWithSuggestions.map(f => ({
-        path: f.filename,
-        position: findLinePositionInDiff(diff, f.filename, f.lineRange.start),
-        body: f.suggestions
-      }))
-
-      console.log(`[reviewbot] - creating review for commit ${latestCommit}`)
-
-      await context.octokit.rest.pulls.createReview({
+      const messageContext = {
         ...common,
         pull_number: pullRequest.pull_number,
-        commit_id: latestCommit,
-        body: 'Please take a look at my comments.',
-        event: 'COMMENT',
-        comments
+        diff,
+        latestCommit,
+        files,
+        installationId: context.payload.installation.id
+      }
+
+      const pubsub = new PubSub({
+        projectId: process.env.PROJECT_ID,
+        apiEndpoint: process.env.PUBSUB_HOST
       })
 
-      console.log('[reviewbot] - review finished')
+      const topic = pubsub.topic(process.env.TOPIC_NAME)
+      const [topicExists] = await topic.exists()
+
+      if (!topicExists) {
+        await topic.create()
+      }
+
+      const messageId = await topic.publishMessage({ json: messageContext })
+
+      console.log('[reviewbot] - ack author comment', messageId)
+
+      await context.octokit.reactions.createForIssueComment({
+        content: 'eyes',
+        comment_id: context.payload.comment.id,
+        ...common
+      })
     } catch (error) {
       console.error(error)
       console.error(`[reviewbot] - encountered an error - ${error.message}`)

@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      CREATE_REVIEW_PATH:
+        required: true
+        type: string
       environment:
         required: true
         type: string
@@ -14,6 +17,12 @@ on:
         required: true
         type: string
       GH_APP_ID:
+        required: true
+        type: string
+      SUBSCRIPTION_NAME:
+        required: true
+        type: string
+      TOPIC_NAME:
         required: true
         type: string
       WEBHOOK_PATH:
@@ -67,9 +76,26 @@ jobs:
           --entry-point=webhook
           --set-secrets=PRIVATE_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/gh-private-key-${{ inputs.environment }}:latest
           --set-secrets=WEBHOOK_SECRET=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/gh-webhook-secret-${{ inputs.environment }}:latest
+          --set-env-vars=APP_ID="${{ inputs.GH_APP_ID }}"
+          --set-env-vars=PROJECT_ID="${{ inputs.GCP_PROJECT_ID }}"
+          --set-env-vars=TOPIC_NAME="${{ inputs.TOPIC_NAME }}"
+          --trigger-http
+          --allow-unauthenticated
+          --region=us-central1
+          --gen2
+
+      - name: 'Deploy createReview to Cloud Run'
+        id: deploy-createReview
+        run: >-
+          gcloud functions deploy ${{ inputs.CREATE_REVIEW_PATH }}
+          --runtime=nodejs18
+          --source=.
+          --entry-point=createReview
+          --set-secrets=PRIVATE_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/gh-private-key-${{ inputs.environment }}:latest
           --set-secrets=CHAT_GPT_API_KEY=projects/${{ inputs.GCP_PROJECT_ID }}/secrets/chat-gpt-api-key-${{ inputs.environment }}:latest
           --set-env-vars=APP_ID="${{ inputs.GH_APP_ID }}"
-          --trigger-http
+          --set-env-vars=SUBSCRIPTION_NAME="${{ inputs.SUBSCRIPTION_NAME }}"
+          --trigger-topic="${{ inputs.TOPIC_NAME }}"
           --allow-unauthenticated
           --region=us-central1
           --gen2
