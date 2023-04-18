@@ -23,7 +23,7 @@
         "test:watch": "node --test --watch tests/"
     },
     "dependencies": {
-        "@google-cloud/pubsub": "^3.4.1",
+        "@google-cloud/pubsub": "^3.5.0",
         "@octokit/auth-app": "^4.0.9",
         "octokit": "^2.0.14",
         "parse-git-patch": "^1.1.0",
