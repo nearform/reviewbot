@@ -24,7 +24,7 @@
     },
     "dependencies": {
         "@google-cloud/pubsub": "^3.5.2",
-        "@octokit/auth-app": "^4.0.9",
+        "@octokit/auth-app": "^4.0.10",
         "octokit": "^2.0.14",
         "parse-git-patch": "^1.1.0",
         "probot": "^12.2.4"
