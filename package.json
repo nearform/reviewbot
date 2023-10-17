@@ -30,7 +30,7 @@
         "probot": "^12.2.4"
     },
     "devDependencies": {
-        "@commitlint/cli": "^17.6.3",
+        "@commitlint/cli": "^17.8.0",
         "@commitlint/config-conventional": "^17.8.0",
         "dotenv": "^16.3.1",
         "eslint": "^8.51.0",
