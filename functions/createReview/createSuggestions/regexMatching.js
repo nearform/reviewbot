@@ -1,3 +1,10 @@
+import {
+  filterAcceptedFiles,
+  filterOnlyModified,
+  groupByLineRange
+} from './prompt-engine'
+import regexRules from './regexRules'
+
 /**
  * Finds and returns issues from a given diff string based on a set of regex rules.
  *
@@ -31,5 +38,29 @@ export const findRegexRules = (diff, rules) => {
 
 export const generateRegexSuggestions = gitDiff => {
   console.log(gitDiff)
-  return []
+
+  const acceptedFiles = filterAcceptedFiles(gitDiff)
+  const filesWithModifiedLines = filterOnlyModified(acceptedFiles)
+
+  const filesWithAddDiff = filesWithModifiedLines.map(file => ({
+    fileName: file.afterName,
+    changes: groupByLineRange(file).filter(group => group.diff[0] === '+ ')
+  }))
+
+  const suggestions = []
+
+  filesWithAddDiff.forEach(file => {
+    file.changes.forEach(change => {
+      suggestions.push({
+        fileName: file.fileName,
+        lineRange: change.range,
+        diff: change.diff,
+        suggestions: findRegexRules(change.diff, regexRules).map(
+          rule => rule.description
+        )
+      })
+    })
+  })
+
+  return suggestions
 }

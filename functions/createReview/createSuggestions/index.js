@@ -33,7 +33,6 @@ async function createSuggestions(gitDiff) {
   )
 
   const regexResponse = generateRegexSuggestions(gitDiff)
-
   return [...response, regexResponse]
 }
 

@@ -1,13 +1,13 @@
 import path from 'node:path'
 
-function filterOnlyModified(files) {
+export function filterOnlyModified(files) {
   return files.map(file => ({
     ...file,
     modifiedLines: file.modifiedLines.filter(line => line.added)
   }))
 }
 
-function filterAcceptedFiles(files) {
+export function filterAcceptedFiles(files) {
   const filteredFiles = files.filter(
     f =>
       path.extname(f.afterName) === '.js' || path.extname(f.afterName) === '.ts'
@@ -15,7 +15,7 @@ function filterAcceptedFiles(files) {
   return filteredFiles
 }
 
-function groupByLineRange({ modifiedLines }) {
+export function groupByLineRange({ modifiedLines }) {
   const output = []
   let range = { start: 0, end: 0 }
   let diff = ''
