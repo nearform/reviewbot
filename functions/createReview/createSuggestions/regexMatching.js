@@ -2,8 +2,8 @@ import {
   filterAcceptedFiles,
   filterOnlyModified,
   groupByLineRange
-} from './prompt-engine'
-import regexRules from './regexRules'
+} from './prompt-engine.js'
+import regexRules from './regexRules.js'
 
 /**
  * Finds and returns issues from a given diff string based on a set of regex rules.
