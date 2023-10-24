@@ -1,4 +1,5 @@
 import buildPrompt from './prompt-engine.js'
+import { generateRegexSuggestions } from './regexMatching.js'
 import generateSuggestions from './suggestions.js'
 
 /**
@@ -30,7 +31,10 @@ async function createSuggestions(gitDiff) {
       return suggestionsForFile
     })
   )
-  return response
+
+  const regexResponse = generateRegexSuggestions(gitDiff)
+
+  return [...response, regexResponse]
 }
 
 export default createSuggestions
