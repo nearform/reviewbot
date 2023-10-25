@@ -1,5 +1,7 @@
 import path from 'path'
 import url from 'url'
+import { readFileSync } from 'fs'
+
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 export const fixtures = [
@@ -57,3 +59,7 @@ export const testRegex = [
       'Using `var` for variable declarations can lead to hoisting-related issues. Consider using `let` or `const` for block-scoped variables.'
   }
 ]
+
+export const gitDiff = JSON.parse(
+  readFileSync(path.join(__dirname, 'gitDiff.json'), 'utf8')
+)

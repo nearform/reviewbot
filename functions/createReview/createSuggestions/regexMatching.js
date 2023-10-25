@@ -1,8 +1,4 @@
-import {
-  filterAcceptedFiles,
-  filterOnlyModified,
-  groupByLineRange
-} from './prompt-engine.js'
+import { filterAcceptedFiles, filterOnlyModified } from './prompt-engine.js'
 import regexRules from './regexRules.js'
 
 /**
@@ -37,27 +33,25 @@ export const findRegexRules = (diff, rules) => {
 }
 
 export const generateRegexSuggestions = gitDiff => {
-  console.log(gitDiff)
-
   const acceptedFiles = filterAcceptedFiles(gitDiff)
   const filesWithModifiedLines = filterOnlyModified(acceptedFiles)
-
-  const filesWithAddDiff = filesWithModifiedLines.map(file => ({
-    fileName: file.afterName,
-    changes: groupByLineRange(file).filter(group => group.diff[0] === '+ ')
-  }))
+  const filesWithAddDiff = filesWithModifiedLines.filter(file => file.added)
 
   const suggestions = []
 
   filesWithAddDiff.forEach(file => {
-    file.changes.forEach(change => {
+    file.modifiedLines.forEach(line => {
+      if (!line.added) return
+      const lineSuggestions = findRegexRules(line.line, regexRules).map(
+        rule => rule.description
+      )
+      if (!lineSuggestions.length) return
+
       suggestions.push({
-        fileName: file.fileName,
-        lineRange: change.range,
-        diff: change.diff,
-        suggestions: findRegexRules(change.diff, regexRules).map(
-          rule => rule.description
-        )
+        fileName: file.afterName,
+        lineRange: { start: line.lineNumber, end: line.lineNumber },
+        diff: line.line,
+        suggestions: lineSuggestions
       })
     })
   })
