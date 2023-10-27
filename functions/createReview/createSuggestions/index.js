@@ -1,5 +1,7 @@
 import buildPrompt from './prompt-engine.js'
 import generateSuggestions from './suggestions.js'
+import { generateAST } from '../astParsing/index.js'
+
 
 /**
   Creates suggestions for each file in a git diff using the ChatGPT transformer API.
@@ -7,11 +9,16 @@ import generateSuggestions from './suggestions.js'
   @returns {Promise<Object[]>} - A promise that resolves to an array of objects containing suggestions for each file.
   @throws {Error} If an error occurs while creating suggestions.
  */
-async function createSuggestions(gitDiff) {
+async function createSuggestions(gitDiff, files) {
   const prompts = buildPrompt(gitDiff)
+
   const response = await Promise.all(
     prompts.map(async file => {
       let suggestionsForFile = {}
+
+      const ast = generateAST(file, files.find())
+      // TODO run AST analysis
+
 
       const transformerResponse = await generateSuggestions({
         transformerType: 'chatGPT',

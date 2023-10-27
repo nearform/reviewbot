@@ -1,5 +1,6 @@
 import { PubSub } from '@google-cloud/pubsub'
 import parseGitPatch from 'parse-git-patch'
+import { getPRContent } from '../createReview/oktokit/index.js'
 
 /**
  * This is the main entrypoint to the Probot app
@@ -70,13 +71,23 @@ export default async app => {
         return
       }
 
+
+      const response = await context.octokit.pulls.listFiles({
+        ...common,
+        pull_number: pullRequest.pull_number,
+      });
+
+      let fullFiles = await getPRContent(context)
+
+
       const messageContext = {
         ...common,
         pull_number: pullRequest.pull_number,
         diff,
         latestCommit,
         files,
-        installationId: context.payload.installation.id
+        installationId: context.payload.installation.id,
+        fullFiles
       }
 
       const pubsub = new PubSub({

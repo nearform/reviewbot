@@ -10,7 +10,7 @@ function filterOnlyModified(files) {
 function filterAcceptedFiles(files) {
   const filteredFiles = files.filter(
     f =>
-      path.extname(f.afterName) === '.js' || path.extname(f.afterName) === '.ts'
+      /\.[tj]sx?$/g.test(path.extname(f.afterName))
   )
   return filteredFiles
 }
@@ -40,7 +40,7 @@ function enhanceWithPromptContext(change) {
         based on analyzing the git diff in order to see whats changed.
         The language in the snippet is JavaScript.
         Feel free to provide any examples as markdown code snippets in your answer.
-  
+
         ${change}
       `
   return [
