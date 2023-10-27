@@ -120,6 +120,19 @@ describe('createSuggestions()', () => {
             added: true
           }
         ]
+      },
+      {
+        added: true,
+        deleted: false,
+        beforeName: 'regexp.example.js',
+        afterName: 'regexp.example.js',
+        modifiedLines: [
+          {
+            added: true,
+            lineNumber: 7,
+            line: '  var foobar = bar + foo'
+          }
+        ]
       }
     ]
     const response = await createSuggestions(gitDiff)
@@ -141,9 +154,28 @@ describe('createSuggestions()', () => {
           start: 1
         },
         suggestions: 'mockSuggestion'
+      },
+      {
+        filename: 'regexp.example.js',
+        lineRange: {
+          start: 7,
+          end: 7
+        },
+        diff: 'var foobar = bar + foo',
+        suggestions: 'mockSuggestion'
+      },
+      {
+        fileName: 'regexp.example.js',
+        lineRange: {
+          start: 7,
+          end: 7
+        },
+        diff: '  var foobar = bar + foo',
+        suggestions: [
+          'Using `var` for variable declarations can lead to hoisting-related issues. Consider using `let` or `const` for block-scoped variables.'
+        ]
       }
     ]
-    assert.strictEqual(response.length, 2)
     assert.deepStrictEqual(response, expectedResponse)
   })
 

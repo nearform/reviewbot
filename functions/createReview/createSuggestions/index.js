@@ -27,12 +27,12 @@ async function createSuggestions(gitDiff) {
           suggestions: suggestion
         }
       })
-
       return suggestionsForFile
     })
   )
 
   const regexResponse = generateRegexSuggestions(gitDiff)
+
   return [...response, ...regexResponse]
 }
 

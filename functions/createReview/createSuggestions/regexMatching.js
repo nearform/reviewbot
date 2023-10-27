@@ -14,20 +14,14 @@ import regexRules from './regexRules.js'
  *   - `id` {string} The id of the rule that matched.
  *   - `description` {string} The description or prompt of the rule that matched.
  */
-export const findRegexRules = (diff, rules) => {
+export const findRegexRulesInLine = (lineContent, rules) => {
   const issues = []
 
-  diff.split('\n').forEach((content, index) => {
-    for (let rule of rules) {
-      if (rule.regex.test(content)) {
-        issues.push({
-          lineNumber: index + 1,
-          id: rule.id,
-          description: rule.prompt
-        })
-      }
+  for (let rule of rules) {
+    if (rule.regex.test(lineContent)) {
+      issues.push(rule)
     }
-  })
+  }
 
   return issues
 }
@@ -42,10 +36,10 @@ export const generateRegexSuggestions = gitDiff => {
   filesWithAddDiff.forEach(file => {
     file.modifiedLines.forEach(line => {
       if (!line.added) return
-      const lineSuggestions = findRegexRules(line.line, regexRules).map(
+      const lineSuggestions = findRegexRulesInLine(line.line, regexRules).map(
         rule => rule.description
       )
-      if (!lineSuggestions.length) return
+      if (lineSuggestions.length === 0) return
 
       suggestions.push({
         fileName: file.afterName,
