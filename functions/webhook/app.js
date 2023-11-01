@@ -46,7 +46,6 @@ export default async app => {
       })
 
       const { files } = parseGitPatch.default(diff)
-
       const { data: commits } = await context.octokit.pulls.listCommits({
         ...common,
         pull_number: pullRequest.pull_number
@@ -71,14 +70,7 @@ export default async app => {
         return
       }
 
-
-      const response = await context.octokit.pulls.listFiles({
-        ...common,
-        pull_number: pullRequest.pull_number,
-      });
-
       let fullFiles = await getPRContent(context)
-
 
       const messageContext = {
         ...common,

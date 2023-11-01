@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
-import createSuggestions from './createSuggestions/index.js'
-import { findLinePositionInDiff } from '../utils.js'
+import { createLLMPRComments } from './llm/index.js'
+import { createASTPRComments } from './astParsing/index.js'
 import getOctokit from './oktokit/index.js'
 
 dotenv.config()
@@ -17,19 +17,20 @@ export default async function app(message) {
   )
 
   console.log('[reviewbot] - creating suggestions', messageContext)
-  const filesWithSuggestions = await createSuggestions(messageContext.files)
+  const llmComments = await createLLMPRComments(
+    messageContext.files,
+    messageContext.diff
+  )
+  const astComments = await createASTPRComments(
+    messageContext.files,
+    message.fullFiles,
+    messageContext.diff
+  )
 
-  const comments = filesWithSuggestions.map(f => ({
-    path: f.filename,
-    position: findLinePositionInDiff(
-      messageContext.diff,
-      f.filename,
-      f.lineRange.start
-    ),
-    body: f.suggestions
-  }))
+  const comments = llmComments
+    .concat(astComments)
+    .filter(({ position }) => position > -1)
 
-  console.log('filesWithSuggestions', filesWithSuggestions)
   console.log(
     `[reviewbot] - creating review for commit ${messageContext.latestCommit}`
   )

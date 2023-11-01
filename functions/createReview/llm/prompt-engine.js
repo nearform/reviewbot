@@ -8,9 +8,8 @@ function filterOnlyModified(files) {
 }
 
 function filterAcceptedFiles(files) {
-  const filteredFiles = files.filter(
-    f =>
-      /\.[tj]sx?$/g.test(path.extname(f.afterName))
+  const filteredFiles = files.filter(f =>
+    /\.[tj]sx?$/g.test(path.extname(f.afterName))
   )
   return filteredFiles
 }

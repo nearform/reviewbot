@@ -1,7 +1,6 @@
 import buildPrompt from './prompt-engine.js'
 import generateSuggestions from './suggestions.js'
-import { generateAST } from '../astParsing/index.js'
-
+import { findLinePositionInDiff } from '../../utils.js'
 
 /**
   Creates suggestions for each file in a git diff using the ChatGPT transformer API.
@@ -9,27 +8,23 @@ import { generateAST } from '../astParsing/index.js'
   @returns {Promise<Object[]>} - A promise that resolves to an array of objects containing suggestions for each file.
   @throws {Error} If an error occurs while creating suggestions.
  */
-async function createSuggestions(gitDiff, files) {
+async function createLLMSuggestions(gitDiff) {
   const prompts = buildPrompt(gitDiff)
 
   const response = await Promise.all(
-    prompts.map(async file => {
+    prompts.map(async filePrompt => {
       let suggestionsForFile = {}
-
-      const ast = generateAST(file, files.find())
-      // TODO run AST analysis
-
 
       const transformerResponse = await generateSuggestions({
         transformerType: 'chatGPT',
-        payload: file.changes
+        payload: filePrompt.changes
       })
 
       transformerResponse.forEach((suggestion, index) => {
         suggestionsForFile = {
-          filename: file.fileName,
-          lineRange: file.changes[index].range,
-          diff: file.changes[index].diff,
+          filename: filePrompt.fileName,
+          lineRange: filePrompt.changes[index].range,
+          diff: filePrompt.changes[index].diff,
           suggestions: suggestion
         }
       })
@@ -40,4 +35,19 @@ async function createSuggestions(gitDiff, files) {
   return response
 }
 
-export default createSuggestions
+function transformSuggestionsIntoComments(suggestions, rawDiff) {
+  const comments = suggestions.map(f => ({
+    path: f.filename,
+    position: findLinePositionInDiff(rawDiff, f.filename, f.lineRange.start),
+    body: f.suggestions
+  }))
+  return comments
+}
+
+export function createLLMPRComments(gitDiff, rawDiff) {
+  const suggestions = createLLMSuggestions(gitDiff)
+  const comments = transformSuggestionsIntoComments(suggestions, rawDiff)
+  return comments
+}
+
+export default createLLMSuggestions

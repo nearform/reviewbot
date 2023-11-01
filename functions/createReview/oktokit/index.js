@@ -28,39 +28,41 @@ async function getOctokit(installationId) {
 }
 
 export async function getPRContent(context) {
-
   const { owner, repo } = context.issue()
   const { pull_number } = context.pullRequest()
 
   const response = await context.octokit.pulls.listFiles({
     owner,
     repo,
-    pull_number,
-  });
+    pull_number
+  })
 
   let fullFiles = []
-  if(response && response.data) {
+  if (response && response.data) {
     fullFiles = response.data
   }
   const fetchFilesPromises = []
   for (const file of fullFiles) {
     if (file.status === 'modified' || file.status === 'added') {
       fetchFilesPromises.push(
-        context.octokit.request('GET /repos/:owner/:repo/contents/:path', {
-          owner,
-          repo,
-          path: file.filename,
-          ref: `pull/${pull_number}/head`,
-        }).then(response => {
-          const content = Buffer.from(response.data.content, 'base64').toString();
-          console.log(content)
-          file.content = content
-        })
+        context.octokit
+          .request('GET /repos/:owner/:repo/contents/:path', {
+            owner,
+            repo,
+            path: file.filename,
+            ref: `pull/${pull_number}/head`
+          })
+          .then(response => {
+            const content = Buffer.from(
+              response.data.content,
+              'base64'
+            ).toString()
+            file.content = content
+          })
       )
-
     }
   }
-  await Promise.all(fetchFilesPromises);
+  await Promise.all(fetchFilesPromises)
 
   return fullFiles
 }

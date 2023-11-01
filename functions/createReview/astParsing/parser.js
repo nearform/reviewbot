@@ -95,3 +95,7 @@ export function isType(node, type) {
     return true
   }
 }
+
+export function isLineEdited(node, editedLineNumbers) {
+  return editedLineNumbers.indexOf(node.loc.start.line) > -1
+}

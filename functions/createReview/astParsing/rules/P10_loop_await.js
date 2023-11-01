@@ -1,13 +1,20 @@
-import { findChildNode, isType } from '../parser.js'
+import { findChildNode, isType, isLineEdited } from '../parser.js'
 
-export default function validator(node) {
+export default function validator(node, editedLineNumbers) {
   if (isType(node, 'ForStatement')) {
     const nestedAwaitExpression = findChildNode(node, childNode =>
       isType(childNode, 'AwaitExpression')
     )
-    if (nestedAwaitExpression) {
+    if (
+      nestedAwaitExpression &&
+      (isLineEdited(node, editedLineNumbers) ||
+        isLineEdited(nestedAwaitExpression, editedLineNumbers))
+    ) {
       return {
-        line: nestedAwaitExpression.loc.start.line,
+        lineNumber: isLineEdited(nestedAwaitExpression, editedLineNumbers)
+          ? nestedAwaitExpression.loc.start.line
+          : node.loc.start.line,
+        lineContent: node.line,
         code: 'P10',
         description: `Review instances of awaiting promises in imperative loops (for, while, do/while) or array native methods (forEach, map).
 
