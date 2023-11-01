@@ -3,7 +3,7 @@ export default [
     id: 'PROMISE_ALL_USAGE',
     regex: /\bPromise\.all\b/i,
     description:
-      'Executing Promise.all(items.map(async => { … })) leads to the creation of an undefined number of Promises, each executing something asynchronous and possibly saturating the event loop and consuming much memory. Use a library like sindresorhus/p-map or sindresorhus/p-all instead.'
+      'Executing Promise.all(items.map(async => { … })) leads to the creation of an undefined number of Promises, each executing something asynchronous and possibly saturating the event loop and consuming too much memory. Use a library like sindresorhus/p-map or sindresorhus/p-all instead.'
   },
   {
     id: 'JSON_PARSE_USAGE',
