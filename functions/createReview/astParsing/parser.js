@@ -33,13 +33,6 @@ export function findChildNode(astDocument, boolFunction) {
     for (let prop of AST_PARSING_PROPS) {
       if (prop in astDocument && Array.isArray(astDocument[prop])) {
         for (let el of astDocument[prop]) {
-          console.log(
-            'Evaluating child 1',
-            prop,
-            '->',
-            el.type,
-            boolFunction(el)
-          )
           if (boolFunction(el)) {
             return el
           }
@@ -49,13 +42,6 @@ export function findChildNode(astDocument, boolFunction) {
           }
         }
       } else if (prop in astDocument) {
-        console.log(
-          'Evaluating child 2',
-          prop,
-          '->',
-          astDocument[prop].type,
-          boolFunction(astDocument[prop])
-        )
         if (boolFunction(astDocument[prop])) {
           return astDocument[prop]
         }

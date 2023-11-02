@@ -1,10 +1,12 @@
 import path from 'node:path'
 
 function filterOnlyModified(files) {
-  return files.map(file => ({
-    ...file,
-    modifiedLines: file.modifiedLines.filter(line => line.added)
-  }))
+  return files
+    .map(file => ({
+      ...file,
+      modifiedLines: file.modifiedLines.filter(line => line.added)
+    }))
+    .filter(file => file.modifiedLines.length > 0)
 }
 
 function filterAcceptedFiles(files) {
@@ -68,7 +70,7 @@ function buildPrompt(payload) {
       }))
     }
   })
-  console.log('[reviewbot] - building prompts', result)
+  console.log(`[reviewbot] - built ${result.length} prompts`, result)
   return result
 }
 

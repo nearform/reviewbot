@@ -14,17 +14,12 @@ export default function validator(node, editedLineNumbers) {
         lineNumber: isLineEdited(nestedAwaitExpression, editedLineNumbers)
           ? nestedAwaitExpression.loc.start.line
           : node.loc.start.line,
-        lineContent: node.line,
         code: 'P10',
         description: `Review instances of awaiting promises in imperative loops (for, while, do/while) or array native methods (forEach, map).
-
-        In many cases they are unnecessary as parallel execution is preferred.
-
-        Prefer using Promise native methods like Promise.all, or Promise.race, or Promise.allSettled or libraries like p-map as recommended next.
-
-        If serial execution is needed, consider using a library like sindresorhus/p-series.
-
-        There is also an eslint rule to enforce this which we recommend using.`
+In many cases they are unnecessary as parallel execution is preferred.
+Prefer using Promise native methods like Promise.all, or Promise.race, or Promise.allSettled or libraries like p-map as recommended next.
+If serial execution is needed, consider using a library like sindresorhus/p-series.
+There is also an eslint rule to enforce this which we recommend using.`
       }
     }
   }

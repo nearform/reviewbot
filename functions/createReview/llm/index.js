@@ -1,6 +1,6 @@
 import buildPrompt from './prompt-engine.js'
 import generateSuggestions from './suggestions.js'
-import { findLinePositionInDiff } from '../../utils.js'
+import { mapLineToDiff } from 'map-line-to-diff'
 
 /**
   Creates suggestions for each file in a git diff using the ChatGPT transformer API.
@@ -9,8 +9,8 @@ import { findLinePositionInDiff } from '../../utils.js'
   @throws {Error} If an error occurs while creating suggestions.
  */
 async function createLLMSuggestions(gitDiff) {
+  console.log(JSON.stringify(gitDiff, null, 2))
   const prompts = buildPrompt(gitDiff)
-
   const response = await Promise.all(
     prompts.map(async filePrompt => {
       let suggestionsForFile = {}
@@ -19,7 +19,7 @@ async function createLLMSuggestions(gitDiff) {
         transformerType: 'chatGPT',
         payload: filePrompt.changes
       })
-
+      // console.log(transformerResponse)
       transformerResponse.forEach((suggestion, index) => {
         suggestionsForFile = {
           filename: filePrompt.fileName,
@@ -36,16 +36,18 @@ async function createLLMSuggestions(gitDiff) {
 }
 
 function transformSuggestionsIntoComments(suggestions, rawDiff) {
-  const comments = suggestions.map(f => ({
-    path: f.filename,
-    position: findLinePositionInDiff(rawDiff, f.filename, f.lineRange.start),
-    body: f.suggestions
-  }))
+  const comments = suggestions.map(f => {
+    return {
+      path: f.filename,
+      position: mapLineToDiff(rawDiff, f.filename, f.lineRange.start),
+      body: f.suggestions
+    }
+  })
   return comments
 }
 
-export function createLLMPRComments(gitDiff, rawDiff) {
-  const suggestions = createLLMSuggestions(gitDiff)
+export async function createLLMPRComments(gitDiff, rawDiff) {
+  const suggestions = await createLLMSuggestions(gitDiff)
   const comments = transformSuggestionsIntoComments(suggestions, rawDiff)
   return comments
 }

@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import { createLLMPRComments } from './llm/index.js'
 import { createASTPRComments } from './astParsing/index.js'
 import getOctokit from './oktokit/index.js'
+import { filterOutInvalidComments } from './utils.js'
 
 dotenv.config()
 /**
@@ -10,29 +11,29 @@ dotenv.config()
  * @return {void}
  */
 export default async function app(message) {
-  console.log('[reviewbot] - createReview', message.data)
+  console.log('[reviewbot] - createReview')
 
   const messageContext = JSON.parse(
     Buffer.from(message.data, 'base64').toString()
   )
 
-  console.log('[reviewbot] - creating suggestions', messageContext)
+  console.log('[reviewbot] - creating suggestions')
+  // const llmComments = []
   const llmComments = await createLLMPRComments(
     messageContext.files,
     messageContext.diff
   )
-  const astComments = await createASTPRComments(
+  // const astComments = []
+  const astComments = createASTPRComments(
     messageContext.files,
-    message.fullFiles,
+    messageContext.fullFiles,
     messageContext.diff
   )
 
-  const comments = llmComments
-    .concat(astComments)
-    .filter(({ position }) => position > -1)
+  const comments = filterOutInvalidComments(llmComments.concat(astComments))
 
   console.log(
-    `[reviewbot] - creating review for commit ${messageContext.latestCommit}`
+    `[reviewbot] - creating review with ${comments.length} comments for commit ${messageContext.latestCommit}`
   )
 
   const octokit = await getOctokit(messageContext.installationId)
@@ -44,7 +45,7 @@ export default async function app(message) {
     commit_id: messageContext.latestCommit,
     body: 'Please take a look at my comments.',
     event: 'COMMENT',
-    comments
+    comments: comments
   })
 
   console.log('[reviewbot] - review finished')

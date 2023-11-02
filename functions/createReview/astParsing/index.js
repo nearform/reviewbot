@@ -6,7 +6,7 @@ import jsxPlugin from 'acorn-jsx'
 
 import validators from './rules/index.js'
 import { parseAndAggregate } from './parser.js'
-import { findLinePositionInDiff } from '../../utils.js'
+import { mapLineToDiff } from 'map-line-to-diff'
 
 function getParser(fileName) {
   const fileExtension = path.extname(fileName)
@@ -21,19 +21,24 @@ function getParser(fileName) {
   return parser
 }
 
+export function isESMFile(fileContent) {
+  return (
+    /^\s*import\s+/gm.test(fileContent) || /^\s*export\s+/gm.test(fileContent)
+  )
+}
+
 export function generateAST(fileContent, fileDiff) {
-  console.log(fileDiff)
   const parser = getParser(fileDiff.afterName)
   if (!parser) return
   let ast
   try {
     ast = parser.parse(fileContent, {
-      sourceType: /^import\s+/.test(fileContent) ? 'module' : 'commonjs',
+      sourceType: isESMFile(fileContent) ? 'module' : 'commonjs',
       locations: true
     })
   } catch (err) {
     console.log(
-      '[reviewbot] - Failed to parse the file content into AST. Falling back to the loose parser.'
+      `[reviewbot] - Failed to parse the file content for [${fileDiff.afterName}] into AST. Falling back to the loose parser. Error: ${err.message}`
     )
     ast = LooseParser.parse(fileContent, { locations: true })
   }
@@ -63,7 +68,13 @@ export function parseForIssues(astDocument, gitDiff) {
 }
 
 export function createASTPRComments(gitDiff, filesContents, rawDiff) {
-  let allIssues = []
+  if (!filesContents) {
+    console.log(
+      '[reviewbot] - Skipping AST comment generation because raw files contents are missing'
+    )
+    return []
+  }
+  let comments = []
   for (let fileDiff of gitDiff) {
     const fileContent = filesContents.find(
       fileContent => fileContent.filename === fileDiff.afterName
@@ -71,17 +82,20 @@ export function createASTPRComments(gitDiff, filesContents, rawDiff) {
     if (fileContent) {
       const ast = generateAST(fileContent.content, fileDiff)
       const fileIssues = parseForIssues(ast, fileDiff)
-      allIssues = allIssues.concat(fileIssues)
+
+      for (let issue of fileIssues) {
+        comments.push({
+          path: fileContent.filename,
+          position: mapLineToDiff(
+            rawDiff,
+            fileContent.filename,
+            issue.lineNumber
+          ),
+          body: issue.description
+        })
+      }
     }
   }
 
-  return allIssues.map(issue => ({
-    path: issue.filename,
-    position: findLinePositionInDiff(
-      rawDiff,
-      issue.filename,
-      issue.lineContent
-    ),
-    body: issue.description
-  }))
+  return comments
 }

@@ -7,7 +7,8 @@ import url from 'url'
 
 import {
   parseForIssues,
-  generateAST
+  generateAST,
+  isESMFile
 } from '../functions/createReview/astParsing/index.js'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
@@ -75,7 +76,7 @@ describe('AST parsing intergration testing', () => {
   })
 })
 
-describe('AST parsing unit testing', () => {
+describe('AST parsing - rules testing', () => {
   test('P10 - nominal', () => {
     const { fileContent, diff } = loadExampleFile(
       '../functions/createReview/astParsing/rules/P10.example.js'
@@ -212,5 +213,52 @@ describe('AST parsing unit testing', () => {
     const ast = generateAST(fileContent, diff)
     const violations = parseForIssues(ast, diff).map(removeDescription)
     assert.deepEqual(violations, [])
+  })
+})
+
+describe('AST parsing unit testing', () => {
+  test('isESMFile', () => {
+    assert.equal(
+      isESMFile(`import foo from 'bar'
+    import bar from 'foo'
+    `),
+      true
+    )
+
+    assert.equal(
+      isESMFile(`const foobar = fs.foo()
+export foobar
+    `),
+      true
+    )
+
+    assert.equal(
+      isESMFile(`const foobar = fs.foo()
+    export foobar
+    `),
+      true
+    )
+
+    assert.equal(
+      isESMFile(`const foobar = fs.foo()
+    export foobar;
+    `),
+      true
+    )
+
+    assert.equal(
+      isESMFile(`const fs = require('fs')
+    const foobar = fs.foo()
+    module.exports = {foobar}
+    `),
+      false
+    )
+
+    assert.equal(
+      isESMFile(`const bar = 'foo'
+    const foobar = 'bar'+ bar
+    `),
+      false
+    )
   })
 })
