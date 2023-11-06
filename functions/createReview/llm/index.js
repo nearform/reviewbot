@@ -9,7 +9,6 @@ import { mapLineToDiff } from 'map-line-to-diff'
   @throws {Error} If an error occurs while creating suggestions.
  */
 async function createLLMSuggestions(gitDiff) {
-  console.log(JSON.stringify(gitDiff, null, 2))
   const prompts = buildPrompt(gitDiff)
   const response = await Promise.all(
     prompts.map(async filePrompt => {

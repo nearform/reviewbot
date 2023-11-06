@@ -10,15 +10,16 @@ import { mapLineToDiff } from 'map-line-to-diff'
 
 function getParser(fileName) {
   const fileExtension = path.extname(fileName)
-  let parser
-  if (fileExtension === '.ts' || fileExtension === '.tsx') {
-    parser = Parser.extend(tsPlugin())
-  } else if (fileExtension === '.jsx') {
-    parser = Parser.extend(jsxPlugin())
-  } else if (fileExtension === '.js') {
-    parser = Parser
+  switch (fileExtension) {
+    case '.ts':
+    case '.tsx':
+      return Parser.extend(tsPlugin())
+    case '.jsx':
+      return Parser.extend(jsxPlugin())
+    case '.js':
+      return Parser
   }
-  return parser
+  return null
 }
 
 export function isESMFile(fileContent) {
