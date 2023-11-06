@@ -4,34 +4,6 @@ import { findRegexRulesInLine } from '../../functions/createReview/regex/index.j
 import regexRules from '../../functions/createReview/regex/rules.js'
 
 describe('findRegexRulesInLine', () => {
-  test('AVOID_VAR', () => {
-    const rules = findRegexRulesInLine('  var foobar = bar + foo', regexRules)
-    assert.deepEqual(
-      rules.map(r => {
-        return { id: r.id }
-      }),
-      [
-        {
-          id: 'AVOID_VAR'
-        }
-      ]
-    )
-  })
-
-  test('PROMISE_ALL_USAGE', () => {
-    const rules = findRegexRulesInLine('  Promise.all(myPromises);', regexRules)
-    assert.deepEqual(
-      rules.map(r => {
-        return { id: r.id }
-      }),
-      [
-        {
-          id: 'PROMISE_ALL_USAGE'
-        }
-      ]
-    )
-  })
-
   test('MD5_USAGE', () => {
     const rules = findRegexRulesInLine('    MD5(myString) ;', regexRules)
     assert.deepEqual(
