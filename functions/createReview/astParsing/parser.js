@@ -77,9 +77,7 @@ export function isCall(node, objectName, propertyName) {
 }
 
 export function isType(node, type) {
-  if (typeof node === 'object' && node !== null && node.type == type) {
-    return true
-  }
+  return typeof node === 'object' && node !== null && node.type == type
 }
 
 export function isLineEdited(node, editedLineNumbers) {
