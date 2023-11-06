@@ -33,7 +33,6 @@ export default async function app(message) {
 
   const regexpComments = createRegexComments(
     messageContext.files,
-    messageContext.fullFiles,
     messageContext.diff
   )
 
