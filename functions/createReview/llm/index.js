@@ -1,5 +1,4 @@
 import buildPrompt from './prompt-engine.js'
-import { generateRegexSuggestions } from './regexMatching.js'
 import generateSuggestions from './suggestions.js'
 import { mapLineToDiff } from 'map-line-to-diff'
 
@@ -32,9 +31,7 @@ async function createLLMSuggestions(gitDiff) {
     })
   )
 
-  const regexResponse = generateRegexSuggestions(gitDiff)
-
-  return [...response, ...regexResponse]
+  return response
 }
 
 function transformSuggestionsIntoComments(suggestions, rawDiff) {

@@ -1,8 +1,8 @@
 import { describe, test } from 'node:test'
 import assert from 'assert'
-import { generateRegexSuggestions } from '../../functions/createReview/createSuggestions/regexMatching.js'
+import { createRegexSuggestions } from '../../functions/createReview/regex/index'
 
-describe('generateRegexSuggestions tests', () => {
+describe('createRegexSuggestions tests', () => {
   test('Avoid using var for variable declarations', () => {
     const gitDiff = [
       {
@@ -55,16 +55,12 @@ describe('generateRegexSuggestions tests', () => {
       }
     ]
 
-    const output = generateRegexSuggestions(gitDiff)
+    const output = createRegexSuggestions(gitDiff)
 
     assert.deepEqual(output, [
       {
-        diff: '  var foobar = bar + foo',
-        fileName: 'functions/createReview/astParsing/rules/J8.example.js',
-        lineRange: {
-          end: 7,
-          start: 7
-        },
+        path: 'functions/createReview/astParsing/rules/J8.example.js',
+        lineNumber: 7,
         suggestions: [
           'Using `var` for variable declarations can lead to hoisting-related issues. Consider using `let` or `const` for block-scoped variables.'
         ]
@@ -114,13 +110,12 @@ describe('generateRegexSuggestions tests', () => {
       }
     ]
 
-    const output = generateRegexSuggestions(gitDiff)
+    const output = createRegexSuggestions(gitDiff)
 
     assert.deepEqual(output, [
       {
-        fileName: 'functions/createReview/astParsing/rules/J3.example.js',
-        lineRange: { start: 6, end: 6 },
-        diff: '  JSON.parse(JSON.stringify(obj))',
+        path: 'functions/createReview/astParsing/rules/J3.example.js',
+        lineNumber: 6,
         suggestions: [
           'JSON.parse should be avoided in favor of a more secure alternative like fastify/secure-json-parse.'
         ]

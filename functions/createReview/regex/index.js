@@ -1,5 +1,6 @@
-import { filterAcceptedFiles, filterOnlyModified } from './prompt-engine.js'
-import regexRules from './regexRules.js'
+import { filterAcceptedFiles, filterOnlyModified } from '../utils.js'
+import regexRules from './rules.js'
+import { mapLineToDiff } from 'map-line-to-diff'
 
 /**
  * Finds and returns issues from a given diff string based on a set of regex rules.
@@ -26,12 +27,12 @@ export const findRegexRulesInLine = (lineContent, rules) => {
   return issues
 }
 
-export const generateRegexSuggestions = gitDiff => {
+export const createRegexSuggestions = gitDiff => {
   const acceptedFiles = filterAcceptedFiles(gitDiff)
   const filesWithModifiedLines = filterOnlyModified(acceptedFiles)
   const filesWithAddDiff = filesWithModifiedLines.filter(file => file.added)
 
-  const suggestions = []
+  const comments = []
 
   filesWithAddDiff.forEach(file => {
     file.modifiedLines.forEach(line => {
@@ -41,14 +42,29 @@ export const generateRegexSuggestions = gitDiff => {
       )
       if (lineSuggestions.length === 0) return
 
-      suggestions.push({
-        fileName: file.afterName,
-        lineRange: { start: line.lineNumber, end: line.lineNumber },
-        diff: line.line,
-        suggestions: lineSuggestions
+      comments.push({
+        path: file.afterName,
+        lineNumber: line.lineNumber,
+        body: lineSuggestions
       })
     })
   })
 
-  return suggestions
+  return comments
+}
+
+function transformSuggestionsIntoComments(suggestions, rawDiff) {
+  const comments = suggestions.map(s => {
+    return {
+      path: s.path,
+      position: mapLineToDiff(rawDiff, s.filename, s.lineNumber),
+      body: s.body
+    }
+  })
+  return comments
+}
+
+export const createRegexComments = (gitDiff, rawDiff) => {
+  const suggestions = createRegexSuggestions(gitDiff)
+  return transformSuggestionsIntoComments(suggestions, rawDiff)
 }

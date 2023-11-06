@@ -1,20 +1,4 @@
-import path from 'node:path'
-
-function filterOnlyModified(files) {
-  return files
-    .map(file => ({
-      ...file,
-      modifiedLines: file.modifiedLines.filter(line => line.added)
-    }))
-    .filter(file => file.modifiedLines.length > 0)
-}
-
-function filterAcceptedFiles(files) {
-  const filteredFiles = files.filter(f =>
-    /\.[tj]sx?$/g.test(path.extname(f.afterName))
-  )
-  return filteredFiles
-}
+import { filterAcceptedFiles, filterOnlyModified } from '../utils.js'
 
 export function groupByLineRange({ modifiedLines }) {
   const output = []
