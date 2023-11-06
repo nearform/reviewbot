@@ -27,10 +27,10 @@ async function createLLMSuggestions(gitDiff) {
           suggestions: suggestion
         }
       })
-
       return suggestionsForFile
     })
   )
+
   return response
 }
 

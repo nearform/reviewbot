@@ -151,7 +151,6 @@ describe('createLLMSuggestions()', () => {
         suggestions: 'mockSuggestion'
       }
     ]
-    assert.strictEqual(response.length, 2)
     assert.deepStrictEqual(response, expectedResponse)
   })
 

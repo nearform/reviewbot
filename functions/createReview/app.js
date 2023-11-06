@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv'
 import { createLLMPRComments } from './llm/index.js'
 import { createASTPRComments } from './astParsing/index.js'
+import { createRegexComments } from './regex/index.js'
 import getOctokit from './oktokit/index.js'
 import { filterOutInvalidComments } from './utils.js'
 
@@ -18,19 +19,26 @@ export default async function app(message) {
   )
 
   console.log('[reviewbot] - creating suggestions')
-  // const llmComments = []
+
   const llmComments = await createLLMPRComments(
     messageContext.files,
     messageContext.diff
   )
-  // const astComments = []
+
   const astComments = createASTPRComments(
     messageContext.files,
     messageContext.fullFiles,
     messageContext.diff
   )
 
-  const comments = filterOutInvalidComments(llmComments.concat(astComments))
+  const regexpComments = createRegexComments(
+    messageContext.files,
+    messageContext.diff
+  )
+
+  const comments = filterOutInvalidComments(
+    llmComments.concat(astComments, regexpComments)
+  )
 
   console.log(
     `[reviewbot] - creating review with ${comments.length} comments for commit ${messageContext.latestCommit}`
