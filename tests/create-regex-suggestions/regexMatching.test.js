@@ -1,7 +1,7 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert'
-import { findRegexRulesInLine } from '../../functions/createReview/createSuggestions/regexMatching.js'
-import regexRules from '../../functions/createReview/createSuggestions/regexRules.js'
+import { findRegexRulesInLine } from '../../functions/createReview/regex/index.js'
+import regexRules from '../../functions/createReview/regex/rules.js'
 
 describe('findRegexRulesInLine', () => {
   test('AVOID_VAR', () => {

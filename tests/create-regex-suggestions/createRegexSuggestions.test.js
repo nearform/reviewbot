@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test'
 import assert from 'assert'
-import { createRegexSuggestions } from '../../functions/createReview/regex/index'
+import { createRegexSuggestions } from '../../functions/createReview/regex/index.js'
 
 describe('createRegexSuggestions tests', () => {
   test('Avoid using var for variable declarations', () => {
@@ -61,7 +61,7 @@ describe('createRegexSuggestions tests', () => {
       {
         path: 'functions/createReview/astParsing/rules/J8.example.js',
         lineNumber: 7,
-        suggestions: [
+        body: [
           'Using `var` for variable declarations can lead to hoisting-related issues. Consider using `let` or `const` for block-scoped variables.'
         ]
       }
@@ -116,7 +116,7 @@ describe('createRegexSuggestions tests', () => {
       {
         path: 'functions/createReview/astParsing/rules/J3.example.js',
         lineNumber: 6,
-        suggestions: [
+        body: [
           'JSON.parse should be avoided in favor of a more secure alternative like fastify/secure-json-parse.'
         ]
       }
