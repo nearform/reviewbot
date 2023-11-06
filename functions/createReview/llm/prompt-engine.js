@@ -1,16 +1,17 @@
 import path from 'node:path'
 
-export function filterOnlyModified(files) {
-  return files.map(file => ({
-    ...file,
-    modifiedLines: file.modifiedLines.filter(line => line.added)
-  }))
+function filterOnlyModified(files) {
+  return files
+    .map(file => ({
+      ...file,
+      modifiedLines: file.modifiedLines.filter(line => line.added)
+    }))
+    .filter(file => file.modifiedLines.length > 0)
 }
 
-export function filterAcceptedFiles(files) {
-  const filteredFiles = files.filter(
-    f =>
-      path.extname(f.afterName) === '.js' || path.extname(f.afterName) === '.ts'
+function filterAcceptedFiles(files) {
+  const filteredFiles = files.filter(f =>
+    /\.[tj]sx?$/g.test(path.extname(f.afterName))
   )
   return filteredFiles
 }
@@ -40,7 +41,7 @@ function enhanceWithPromptContext(change) {
         based on analyzing the git diff in order to see whats changed.
         The language in the snippet is JavaScript.
         Feel free to provide any examples as markdown code snippets in your answer.
-  
+
         ${change}
       `
   return [
@@ -69,7 +70,7 @@ function buildPrompt(payload) {
       }))
     }
   })
-  console.log('[reviewbot] - building prompts', result)
+  console.log(`[reviewbot] - built ${result.length} prompts`, result)
   return result
 }
 

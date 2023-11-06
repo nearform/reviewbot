@@ -1,7 +1,8 @@
 import * as dotenv from 'dotenv'
-import createSuggestions from './createSuggestions/index.js'
-import { findLinePositionInDiff } from '../utils.js'
+import { createLLMPRComments } from './llm/index.js'
+import { createASTPRComments } from './astParsing/index.js'
 import getOctokit from './oktokit/index.js'
+import { filterOutInvalidComments } from './utils.js'
 
 dotenv.config()
 /**
@@ -10,28 +11,29 @@ dotenv.config()
  * @return {void}
  */
 export default async function app(message) {
-  console.log('[reviewbot] - createReview', message.data)
+  console.log('[reviewbot] - createReview')
 
   const messageContext = JSON.parse(
     Buffer.from(message.data, 'base64').toString()
   )
 
-  console.log('[reviewbot] - creating suggestions', messageContext)
-  const filesWithSuggestions = await createSuggestions(messageContext.files)
+  console.log('[reviewbot] - creating suggestions')
+  // const llmComments = []
+  const llmComments = await createLLMPRComments(
+    messageContext.files,
+    messageContext.diff
+  )
+  // const astComments = []
+  const astComments = createASTPRComments(
+    messageContext.files,
+    messageContext.fullFiles,
+    messageContext.diff
+  )
 
-  const comments = filesWithSuggestions.map(f => ({
-    path: f.filename,
-    position: findLinePositionInDiff(
-      messageContext.diff,
-      f.filename,
-      f.lineRange.start
-    ),
-    body: f.suggestions
-  }))
+  const comments = filterOutInvalidComments(llmComments.concat(astComments))
 
-  console.log('filesWithSuggestions', filesWithSuggestions)
   console.log(
-    `[reviewbot] - creating review for commit ${messageContext.latestCommit}`
+    `[reviewbot] - creating review with ${comments.length} comments for commit ${messageContext.latestCommit}`
   )
 
   const octokit = await getOctokit(messageContext.installationId)
@@ -43,7 +45,7 @@ export default async function app(message) {
     commit_id: messageContext.latestCommit,
     body: 'Please take a look at my comments.',
     event: 'COMMENT',
-    comments
+    comments: comments
   })
 
   console.log('[reviewbot] - review finished')
