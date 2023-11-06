@@ -1,6 +1,6 @@
 import { PubSub } from '@google-cloud/pubsub'
-import parseGitPatch from 'parse-git-patch'
-
+import parseGitPatch from './parseGitPatch.js'
+import { getPRContent } from '../createReview/oktokit/index.js'
 /**
  * This is the main entrypoint to the Probot app
  * @param {import('probot').Probot} app
@@ -40,12 +40,11 @@ export default async app => {
         ...common,
         pull_number: pullRequest.pull_number,
         mediaType: {
-          format: 'patch'
+          format: 'diff'
         }
       })
 
-      const { files } = parseGitPatch.default(diff)
-
+      const { files } = parseGitPatch(diff)
       const { data: commits } = await context.octokit.pulls.listCommits({
         ...common,
         pull_number: pullRequest.pull_number
@@ -70,13 +69,16 @@ export default async app => {
         return
       }
 
+      let fullFiles = await getPRContent(context)
+
       const messageContext = {
         ...common,
         pull_number: pullRequest.pull_number,
         diff,
         latestCommit,
         files,
-        installationId: context.payload.installation.id
+        installationId: context.payload.installation.id,
+        fullFiles
       }
 
       const pubsub = new PubSub({

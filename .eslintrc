@@ -8,5 +8,5 @@
     "ecmaVersion": 2022,
     "sourceType": "module"
   },
-  "ignorePatterns": ["dist/**"]
+  "ignorePatterns": ["dist/**", "functions/createReview/astParsing/rules/*.example.js"]
 }

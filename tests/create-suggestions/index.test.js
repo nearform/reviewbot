@@ -1,9 +1,9 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert'
 import fetchMock from 'fetch-mock'
-import createSuggestions from '../../functions/createReview/createSuggestions/index.js'
+import createLLMSuggestions from '../../functions/createReview/llm/index.js'
 
-describe('createSuggestions()', () => {
+describe('createLLMSuggestions()', () => {
   test('should generate a a sugggestion for a valid git diff with one file', async t => {
     t.after(() => {
       fetchMock.restore()
@@ -46,7 +46,15 @@ describe('createSuggestions()', () => {
         ]
       }
     ]
-    const response = await createSuggestions(gitDiff)
+    const files = [
+      {
+        filename: 'test.js',
+        status: 'added',
+        content: `const a = 1;\n- const a = 2;\n
+      const a = 1;`
+      }
+    ]
+    const response = await createLLMSuggestions(gitDiff, files)
     const expectedResponse = [
       {
         diff: 'const a = 1;',
@@ -122,7 +130,7 @@ describe('createSuggestions()', () => {
         ]
       }
     ]
-    const response = await createSuggestions(gitDiff)
+    const response = await createLLMSuggestions(gitDiff)
     const expectedResponse = [
       {
         diff: 'const a = 1;',
@@ -189,7 +197,7 @@ describe('createSuggestions()', () => {
         ]
       }
     ]
-    const response = await createSuggestions(gitDiff)
+    const response = await createLLMSuggestions(gitDiff)
     const expectedResponse = []
     assert.deepStrictEqual(response, expectedResponse)
   })

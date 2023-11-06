@@ -25,7 +25,12 @@
     "dependencies": {
         "@google-cloud/pubsub": "^4.0.6",
         "@octokit/auth-app": "^6.0.1",
+        "acorn": "^8.10.0",
+        "acorn-loose": "^8.4.0",
+        "acorn-typescript": "^1.4.10",
+        "map-line-to-diff": "^1.0.0-beta.2",
         "octokit": "^3.1.1",
+        "parse-diff": "^0.11.1",
         "parse-git-patch": "^1.2.2",
         "probot": "^12.3.1"
     },

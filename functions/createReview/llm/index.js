@@ -1,5 +1,6 @@
 import buildPrompt from './prompt-engine.js'
 import generateSuggestions from './suggestions.js'
+import { mapLineToDiff } from 'map-line-to-diff'
 
 /**
   Creates suggestions for each file in a git diff using the ChatGPT transformer API.
@@ -7,22 +8,22 @@ import generateSuggestions from './suggestions.js'
   @returns {Promise<Object[]>} - A promise that resolves to an array of objects containing suggestions for each file.
   @throws {Error} If an error occurs while creating suggestions.
  */
-async function createSuggestions(gitDiff) {
+async function createLLMSuggestions(gitDiff) {
   const prompts = buildPrompt(gitDiff)
   const response = await Promise.all(
-    prompts.map(async file => {
+    prompts.map(async filePrompt => {
       let suggestionsForFile = {}
 
       const transformerResponse = await generateSuggestions({
         transformerType: 'chatGPT',
-        payload: file.changes
+        payload: filePrompt.changes
       })
-
+      // console.log(transformerResponse)
       transformerResponse.forEach((suggestion, index) => {
         suggestionsForFile = {
-          filename: file.fileName,
-          lineRange: file.changes[index].range,
-          diff: file.changes[index].diff,
+          filename: filePrompt.fileName,
+          lineRange: filePrompt.changes[index].range,
+          diff: filePrompt.changes[index].diff,
           suggestions: suggestion
         }
       })
@@ -33,4 +34,21 @@ async function createSuggestions(gitDiff) {
   return response
 }
 
-export default createSuggestions
+function transformSuggestionsIntoComments(suggestions, rawDiff) {
+  const comments = suggestions.map(f => {
+    return {
+      path: f.filename,
+      position: mapLineToDiff(rawDiff, f.filename, f.lineRange.start),
+      body: f.suggestions
+    }
+  })
+  return comments
+}
+
+export async function createLLMPRComments(gitDiff, rawDiff) {
+  const suggestions = await createLLMSuggestions(gitDiff)
+  const comments = transformSuggestionsIntoComments(suggestions, rawDiff)
+  return comments
+}
+
+export default createLLMSuggestions
