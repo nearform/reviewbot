@@ -20,6 +20,7 @@ export default async app => {
       // if (user.type === 'Bot') {
       //   return
       // }
+      console.log(JSON.stringify(context.payload))
       return;
 
       const botCall = '/reviewbot review'
