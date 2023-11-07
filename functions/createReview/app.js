@@ -4,6 +4,9 @@ import { createASTPRComments } from './astParsing/index.js'
 import { createRegexComments } from './regex/index.js'
 import getOctokit from './oktokit/index.js'
 import { filterOutInvalidComments } from './utils.js'
+import pino from 'pino'
+
+const logger = pino({ name: 'reviewbot' })
 
 dotenv.config()
 /**
@@ -12,13 +15,13 @@ dotenv.config()
  * @return {void}
  */
 export default async function app(message) {
-  console.log('[reviewbot] - createReview')
+  logger.info('createReview')
 
   const messageContext = JSON.parse(
     Buffer.from(message.data, 'base64').toString()
   )
 
-  console.log('[reviewbot] - creating suggestions')
+  logger.info('creating suggestions')
 
   const llmComments = await createLLMPRComments(
     messageContext.files,
@@ -56,5 +59,5 @@ export default async function app(message) {
     comments: comments
   })
 
-  console.log('[reviewbot] - review finished')
+  logger.info('review finished')
 }

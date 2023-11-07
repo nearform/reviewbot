@@ -556,10 +556,10 @@ index 3b3ccbc..25ac1b5 100644
 +import path from 'node:path'
 +import { LooseParser } from 'acorn-loose'
 +import jsxPlugin from 'acorn-jsx'
- 
+
  import validators from './rules/index.js'
  import { parseAndAggregate } from './parser.js'
- 
+
 -const parser = Parser
 -  .extend
 -  // jsxPlugin()
@@ -587,10 +587,10 @@ index 3b3ccbc..25ac1b5 100644
 +      locations: true
 +    })
 +  } catch(err) {
-+    console.log('[reviewbot] - Failed to parse the file content into AST. Falling back to the loose parser.')
++    logger.info('Failed to parse the file content into AST. Falling back to the loose parser.')
 +    ast = LooseParser.parse(fileContent, {locations: true})
 +  }
- 
+
 -export function generateAST(fileContent) {
 -  return parser.parse(fileContent, {
 -    sourceType: 'module',
@@ -599,12 +599,12 @@ index 3b3ccbc..25ac1b5 100644
 +  ast.diff = fileDiff
 +  return ast
  }
- 
+
  function aggregateComments(astNode) {
 @@ -29,6 +49,7 @@ function aggregateComments(astNode) {
    return comments
  }
- 
+
 -export function parseForIssues(astDocument) {
 -  return parseAndAggregate(astDocument, aggregateComments)
 +export function parseForIssues(astDocument, gitDiff) {
@@ -620,7 +620,7 @@ index 9169e6f..a8d7514 100644
  import generateSuggestions from './suggestions.js'
 +import { generateAST } from '../astParsing/index.js'
 +
- 
+
  /**
    Creates suggestions for each file in a git diff using the ChatGPT transformer API.
 @@ -7,12 +9,17 @@ import generateSuggestions from './suggestions.js'
@@ -634,7 +634,7 @@ index 9169e6f..a8d7514 100644
    const response = await Promise.all(
      prompts.map(async file => {
        let suggestionsForFile = {}
- 
+
 +      const ast = generateAST(file, files.find())
 +      // TODO run AST analysis
 +
@@ -659,7 +659,7 @@ index 49f308f..5b4f65d 100644
          based on analyzing the git diff in order to see whats changed.
          The language in the snippet is JavaScript.
          Feel free to provide any examples as markdown code snippets in your answer.
--  
+-
 +
          ${change}
        `
@@ -671,7 +671,7 @@ index b73270e..a2cfd36 100644
 @@ -27,4 +27,42 @@ async function getOctokit(installationId) {
    })
  }
- 
+
 +export async function getPRContent(context) {
 +
 +  const { owner, repo } = context.issue()
@@ -719,13 +719,13 @@ index 6992426..66f244d 100644
  import { PubSub } from '@google-cloud/pubsub'
  import parseGitPatch from 'parse-git-patch'
 +import { getPRContent } from '../createReview/oktokit/index.js'
- 
+
  /**
   * This is the main entrypoint to the Probot app
 @@ -70,13 +71,23 @@ export default async app => {
          return
        }
- 
+
 +
 +      const response = await context.octokit.pulls.listFiles({
 +        ...common,
@@ -745,7 +745,7 @@ index 6992426..66f244d 100644
 +        installationId: context.payload.installation.id,
 +        fullFiles
        }
- 
+
        const pubsub = new PubSub({
 
 From b8537f5a61dae7be7a216c417efd0f1b98cd7efb Mon Sep 17 00:00:00 2001
@@ -786,12 +786,12 @@ index 65523cd..74d9806 100644
 +import { createLLMPRComments } from './llm/index.js'
 +import { createASTPRComments } from './astParsing/index.js'
  import getOctokit from './oktokit/index.js'
- 
+
  dotenv.config()
 @@ -17,19 +17,20 @@ export default async function app(message) {
    )
- 
-   console.log('[reviewbot] - creating suggestions', messageContext)
+
+   logger.info('creating suggestions', messageContext)
 -  const filesWithSuggestions = await createSuggestions(messageContext.files)
 -
 -  const comments = filesWithSuggestions.map(f => ({
@@ -827,11 +827,11 @@ index 25ac1b5..af432d5 100644
 --- a/functions/createReview/astParsing/index.js
 +++ b/functions/createReview/astParsing/index.js
 @@ -6,50 +6,82 @@ import jsxPlugin from 'acorn-jsx'
- 
+
  import validators from './rules/index.js'
  import { parseAndAggregate } from './parser.js'
 +import { findLinePositionInDiff } from '../../utils.js'
- 
+
  function getParser(fileName) {
    const fileExtension = path.extname(fileName)
 -  let parser;
@@ -848,7 +848,7 @@ index 25ac1b5..af432d5 100644
    }
    return parser
  }
- 
+
 -export function generateAST(fileDiff, fileContent) {
 +export function generateAST(fileContent, fileDiff) {
 +  console.log(fileDiff)
@@ -863,7 +863,7 @@ index 25ac1b5..af432d5 100644
        locations: true
      })
 -  } catch(err) {
--    console.log('[reviewbot] - Failed to parse the file content into AST. Falling back to the loose parser.')
+-    logger.info('Failed to parse the file content into AST. Falling back to the loose parser.')
 -    ast = LooseParser.parse(fileContent, {locations: true})
 +  } catch (err) {
 +    console.log(
@@ -871,11 +871,11 @@ index 25ac1b5..af432d5 100644
 +    )
 +    ast = LooseParser.parse(fileContent, { locations: true })
    }
- 
+
    ast.diff = fileDiff
    return ast
  }
- 
+
 -function aggregateComments(astNode) {
 -  const comments = []
 -  for (let validator of validators) {
@@ -895,7 +895,7 @@ index 25ac1b5..af432d5 100644
    }
 -  return comments
  }
- 
+
  export function parseForIssues(astDocument, gitDiff) {
 -  // TODO: only report issues on added lines
 -  return parseAndAggregate(astDocument, gitDiff, aggregateComments)
@@ -975,7 +975,7 @@ index 73f5576..2eada56 100644
 @@ -1,13 +1,20 @@
 -import { findChildNode, isType } from '../parser.js'
 +import { findChildNode, isType, isLineEdited } from '../parser.js'
- 
+
 -export default function validator(node) {
 +export default function validator(node, editedLineNumbers) {
    if (isType(node, 'ForStatement')) {
@@ -996,7 +996,7 @@ index 73f5576..2eada56 100644
 +        lineContent: node.line,
          code: 'P10',
          description: `Review instances of awaiting promises in imperative loops (for, while, do/while) or array native methods (forEach, map).
- 
+
 diff --git a/functions/createReview/astParsing/rules/P11_unbound_promise.js b/functions/createReview/astParsing/rules/P11_unbound_promise.js
 index f232bbb..494d205 100644
 --- a/functions/createReview/astParsing/rules/P11_unbound_promise.js
@@ -1004,7 +1004,7 @@ index f232bbb..494d205 100644
 @@ -1,9 +1,10 @@
 -import { isCall } from '../parser.js'
 +import { isCall, isLineEdited } from '../parser.js'
- 
+
 -export default function validator(node) {
 -  if (isCall(node, 'Promise', 'all')) {
 +export default function validator(node, editedLineNumbers) {
@@ -1029,7 +1029,7 @@ index a8d7514..f59d619 100644
 -import { generateAST } from '../astParsing/index.js'
 -
 +import { findLinePositionInDiff } from '../../utils.js'
- 
+
  /**
    Creates suggestions for each file in a git diff using the ChatGPT transformer API.
 @@ -9,27 +8,23 @@ import { generateAST } from '../astParsing/index.js'
@@ -1039,12 +1039,12 @@ index a8d7514..f59d619 100644
 -async function createSuggestions(gitDiff, files) {
 +async function createLLMSuggestions(gitDiff) {
    const prompts = buildPrompt(gitDiff)
- 
+
    const response = await Promise.all(
 -    prompts.map(async file => {
 +    prompts.map(async filePrompt => {
        let suggestionsForFile = {}
- 
+
 -      const ast = generateAST(file, files.find())
 -      // TODO run AST analysis
 -
@@ -1054,7 +1054,7 @@ index a8d7514..f59d619 100644
 -        payload: file.changes
 +        payload: filePrompt.changes
        })
- 
+
        transformerResponse.forEach((suggestion, index) => {
          suggestionsForFile = {
 -          filename: file.fileName,
@@ -1069,7 +1069,7 @@ index a8d7514..f59d619 100644
 @@ -40,4 +35,19 @@ async function createSuggestions(gitDiff, files) {
    return response
  }
- 
+
 -export default createSuggestions
 +function transformSuggestionsIntoComments(suggestions, rawDiff) {
 +  const comments = suggestions.map(f => ({
@@ -1096,7 +1096,7 @@ index 5b4f65d..fba757e 100644
 +++ b/functions/createReview/llm/prompt-engine.js
 @@ -8,9 +8,8 @@ function filterOnlyModified(files) {
  }
- 
+
  function filterAcceptedFiles(files) {
 -  const filteredFiles = files.filter(
 -    f =>
@@ -1116,12 +1116,12 @@ index a2cfd36..8adae26 100644
 +++ b/functions/createReview/oktokit/index.js
 @@ -28,39 +28,41 @@ async function getOctokit(installationId) {
  }
- 
+
  export async function getPRContent(context) {
 -
    const { owner, repo } = context.issue()
    const { pull_number } = context.pullRequest()
- 
+
    const response = await context.octokit.pulls.listFiles({
      owner,
      repo,
@@ -1129,7 +1129,7 @@ index a2cfd36..8adae26 100644
 -  });
 +    pull_number
 +  })
- 
+
    let fullFiles = []
 -  if(response && response.data) {
 +  if (response && response.data) {
@@ -1169,7 +1169,7 @@ index a2cfd36..8adae26 100644
    }
 -  await Promise.all(fetchFilesPromises);
 +  await Promise.all(fetchFilesPromises)
- 
+
    return fullFiles
  }
 diff --git a/functions/webhook/app.js b/functions/webhook/app.js
@@ -1178,7 +1178,7 @@ index 66f244d..2560074 100644
 +++ b/functions/webhook/app.js
 @@ -46,7 +46,6 @@ export default async app => {
        })
- 
+
        const { files } = parseGitPatch.default(diff)
 -
        const { data: commits } = await context.octokit.pulls.listCommits({
@@ -1187,7 +1187,7 @@ index 66f244d..2560074 100644
 @@ -71,15 +70,8 @@ export default async app => {
          return
        }
- 
+
 -
 -      const response = await context.octokit.pulls.listFiles({
 -        ...common,
@@ -1195,7 +1195,7 @@ index 66f244d..2560074 100644
 -      });
 -
        let fullFiles = await getPRContent(context)
- 
+
 -
        const messageContext = {
          ...common,
@@ -1972,7 +1972,7 @@ index c5b0e0a..ccfa3f3 100644
          }
        } else {
 @@ -31,41 +31,186 @@ function parseForExpectedViolations(fileContent) {
- 
+
  function removeDescription(violation) {
    return {
 -    line: violation.line,
@@ -1980,7 +1980,7 @@ index c5b0e0a..ccfa3f3 100644
      code: violation.code
    }
  }
- 
+
 +function loadExampleFile(relativeFilePath) {
 +  const exampleFileContent = readFileSync(
 +    path.join(__dirname, relativeFilePath),
@@ -2036,13 +2036,13 @@ index c5b0e0a..ccfa3f3 100644
 -    const violations = parseForIssues(ast).map(removeDescription)
 +    const ast = generateAST(fileContent, diff)
 +    const violations = parseForIssues(ast, diff).map(removeDescription)
- 
+
 -    const expectedViolations = parseForExpectedViolations(jsFile)
 +    const expectedViolations = parseForExpectedViolations(fileContent)
      assert.notEqual(violations.length, 0)
      assert.deepEqual(violations, expectedViolations)
    })
- 
+
 -  test('P11', () => {
 -    const jsFile = readFileSync(
 -      path.join(
@@ -2133,7 +2133,7 @@ index c5b0e0a..ccfa3f3 100644
 -    const violations = parseForIssues(ast).map(removeDescription)
 +    const ast = generateAST(fileContent, diff)
 +    const violations = parseForIssues(ast, diff).map(removeDescription)
- 
+
 -    const expectedViolations = parseForExpectedViolations(jsFile)
 +    const expectedViolations = parseForExpectedViolations(fileContent)
      assert.notEqual(violations.length, 0)
@@ -2189,7 +2189,7 @@ index f397d80..cd908df 100644
  import fetchMock from 'fetch-mock'
 -import createSuggestions from '../../functions/createReview/createSuggestions/index.js'
 +import createLLMSuggestions from '../../functions/createReview/llm/index.js'
- 
+
 -describe('createSuggestions()', () => {
 +describe('createLLMSuggestions()', () => {
    test('should generate a a sugggestion for a valid git diff with one file', async t => {
