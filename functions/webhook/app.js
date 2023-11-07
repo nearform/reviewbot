@@ -13,13 +13,14 @@ export default async app => {
       - pull_request_review_comment.created
       - pull_request_review_comment.edited */
 
-  app.on(['issue_comment'], async context => {
+  app.on(['issue_comment', 'push_request'], async context => {
     try {
-      const { body, user } = context.payload.comment
+      // const { body, user } = context.payload.comment
 
-      if (user.type === 'Bot') {
-        return
-      }
+      // if (user.type === 'Bot') {
+      //   return
+      // }
+      return;
 
       const botCall = '/reviewbot review'
       if (body.indexOf(botCall) === -1) {
