@@ -1,4 +1,12 @@
 import path from 'node:path'
+import pino from 'pino'
+
+const logger = pino({ name: 'reviewbot' })
+
+export const REVIEW_TYPE = {
+  LLM: 'llm',
+  RuleBased: 'rule_based'
+}
 
 export function filterOutInvalidComments(comments) {
   const validComments = []
@@ -9,8 +17,8 @@ export function filterOutInvalidComments(comments) {
       validComments.push(comment)
     } else {
       invalidComments.push(comment)
-      console.error(
-        `[reviewbot] - ERROR. Removing generated comment because its position in the diff could not be determined. file=${comment.path}, diff position=${comment.position}]`
+      logger.error(
+        `ERROR. Removing generated comment because its position in the diff could not be determined. file=${comment.path}, diff position=${comment.position}]`
       )
     }
   }

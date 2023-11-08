@@ -1,6 +1,9 @@
 import { Octokit } from 'octokit'
 import { createAppAuth } from '@octokit/auth-app'
 import { getPrivateKey } from '@probot/get-private-key'
+import pino from 'pino'
+
+const logger = pino({ name: 'reviewbot' })
 
 /**
  * Creates and returns an authenticated Octokit instance
@@ -11,7 +14,7 @@ import { getPrivateKey } from '@probot/get-private-key'
  * @throws {Error} Throws an error if there is an issue with the authentication.
  */
 async function getOctokit(installationId) {
-  console.log('[reviewbot] - getting octokit', installationId)
+  logger.info('getting octokit', installationId)
   const appAuth = createAppAuth({
     appId: process.env.APP_ID,
     privateKey: getPrivateKey()

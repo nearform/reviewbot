@@ -7,6 +7,10 @@ import jsxPlugin from 'acorn-jsx'
 import validators from './rules/index.js'
 import { parseAndAggregate } from './parser.js'
 import { mapLineToDiff } from 'map-line-to-diff'
+import pino from 'pino'
+import { filterAcceptedFiles, filterOnlyModified } from '../utils.js'
+
+const logger = pino({ name: 'reviewbot' })
 
 function getParser(fileName) {
   const fileExtension = path.extname(fileName)
@@ -38,8 +42,8 @@ export function generateAST(fileContent, fileDiff) {
       locations: true
     })
   } catch (err) {
-    console.log(
-      `[reviewbot] - Failed to parse the file content for [${fileDiff.afterName}] into AST. Falling back to the loose parser. Error: ${err.message}`
+    logger.info(
+      `Failed to parse the file content for [${fileDiff.afterName}] into AST. Falling back to the loose parser. Error: ${err.message}`
     )
     ast = LooseParser.parse(fileContent, { locations: true })
   }
@@ -70,20 +74,28 @@ export function parseForIssues(astDocument, gitDiff) {
 
 export function createASTPRComments(gitDiff, filesContents, rawDiff) {
   if (!filesContents) {
-    console.log(
-      '[reviewbot] - Skipping AST comment generation because raw files contents are missing'
+    logger.info(
+      'Skipping AST comment generation because raw files contents are missing'
     )
     return []
   }
+  const acceptedFiles = filterAcceptedFiles(gitDiff)
+  const filesWithModifiedLines = filterOnlyModified(acceptedFiles)
+
   let comments = []
-  for (let fileDiff of gitDiff) {
+  logger.info(
+    `Evaluating ${filesWithModifiedLines.length} files for AST rules violations`
+  )
+  for (let fileDiff of filesWithModifiedLines) {
     const fileContent = filesContents.find(
       fileContent => fileContent.filename === fileDiff.afterName
     )
     if (fileContent) {
       const ast = generateAST(fileContent.content, fileDiff)
       const fileIssues = parseForIssues(ast, fileDiff)
-
+      logger.info(
+        `Found ${fileIssues.length} violations in file ${fileContent.filename}`
+      )
       for (let issue of fileIssues) {
         comments.push({
           path: fileContent.filename,

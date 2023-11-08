@@ -1,6 +1,9 @@
 import { filterAcceptedFiles, filterOnlyModified } from '../utils.js'
 import regexRules from './rules.js'
 import { mapLineToDiff } from 'map-line-to-diff'
+import pino from 'pino'
+
+const logger = pino({ name: 'reviewbot' })
 
 /**
  * Finds and returns issues from a given diff string based on a set of regex rules.
@@ -42,6 +45,9 @@ export const createRegexSuggestions = gitDiff => {
       )
       if (lineSuggestions.length === 0) return
 
+      logger.info(
+        `Found ${lineSuggestions.length} regexp violations in file ${file.afterName}`
+      )
       comments.push({
         path: file.afterName,
         lineNumber: line.lineNumber,
