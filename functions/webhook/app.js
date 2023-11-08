@@ -20,7 +20,7 @@ export default async app => {
       - pull_request_review_comment.created
       - pull_request_review_comment.edited */
 
-  app.on(['issue_comment', 'push_request'], async context => {
+  app.on(['issue_comment', 'pull_request'], async context => {
     try {
       if (shouldTriggerLLMReview(context.payload)) {
         await triggerLLMReview(context)
