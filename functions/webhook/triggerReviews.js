@@ -2,6 +2,7 @@ import { PubSub } from '@google-cloud/pubsub'
 import parseGitPatch from './parseGitPatch.js'
 import { getPRContent } from '../createReview/oktokit/index.js'
 import pino from 'pino'
+import { REVIEW_TYPE } from '../createReview/utils.js'
 
 const logger = pino({ name: 'reviewbot' })
 
@@ -89,7 +90,7 @@ export function shouldTriggerRuleBasedReview(payload) {
 
 export async function triggerLLMReview(context) {
   const data = await fetchGithubData(context)
-  data.reviewType = 'llm'
+  data.reviewType = REVIEW_TYPE.LLM
   const messageId = await publishMessage(data)
 
   logger.info('ack author comment', { pubsubMessageId: messageId })
@@ -106,6 +107,6 @@ export async function triggerLLMReview(context) {
 
 export async function triggerRuleBasedReview(context) {
   const data = await fetchGithubData(context)
-  data.reviewType = 'rule_based'
+  data.reviewType = REVIEW_TYPE.RuleBased
   await publishMessage(data)
 }

@@ -3,6 +3,11 @@ import pino from 'pino'
 
 const logger = pino({ name: 'reviewbot' })
 
+export const REVIEW_TYPE = {
+  LLM: 'llm',
+  RuleBased: 'rule_based'
+}
+
 export function filterOutInvalidComments(comments) {
   const validComments = []
   const invalidComments = []

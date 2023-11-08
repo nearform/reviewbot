@@ -2,8 +2,8 @@ import * as dotenv from 'dotenv'
 import { createLLMPRComments } from './llm/index.js'
 import { createASTPRComments } from './astParsing/index.js'
 import { createRegexComments } from './regex/index.js'
+import { REVIEW_TYPE, filterOutInvalidComments } from './utils.js'
 import getOctokit from './oktokit/index.js'
-import { filterOutInvalidComments } from './utils.js'
 import pino from 'pino'
 
 const logger = pino({ name: 'reviewbot' })
@@ -21,30 +21,39 @@ export default async function app(message) {
     Buffer.from(message.data, 'base64').toString()
   )
 
-  logger.info('creating suggestions')
+  let comments = []
 
-  const llmComments = await createLLMPRComments(
-    messageContext.files,
-    messageContext.diff
-  )
+  if (messageContext.reviewType === REVIEW_TYPE.LLM) {
+    logger.info('Creating LLM review comments')
+    comments = await createLLMPRComments(
+      messageContext.files,
+      messageContext.diff
+    )
+  } else if (messageContext.reviewType === REVIEW_TYPE.RuleBased) {
+    logger.info('Creating rule based review comments')
+    const astComments = createASTPRComments(
+      messageContext.files,
+      messageContext.fullFiles,
+      messageContext.diff
+    )
 
-  const astComments = createASTPRComments(
-    messageContext.files,
-    messageContext.fullFiles,
-    messageContext.diff
-  )
+    const regexpComments = createRegexComments(
+      messageContext.files,
+      messageContext.diff
+    )
 
-  const regexpComments = createRegexComments(
-    messageContext.files,
-    messageContext.diff
-  )
+    comments = astComments.concat(regexpComments)
+  } else {
+    logger.warn(
+      'Received a message but could not determine the type of review requested. Ignoring the message.'
+    )
+    return
+  }
 
-  const comments = filterOutInvalidComments(
-    llmComments.concat(astComments, regexpComments)
-  )
+  comments = filterOutInvalidComments(comments)
 
-  console.log(
-    `[reviewbot] - creating review with ${comments.length} comments for commit ${messageContext.latestCommit}`
+  logger.info(
+    `creating review with ${comments.length} comments for commit ${messageContext.latestCommit}`
   )
 
   const octokit = await getOctokit(messageContext.installationId)
