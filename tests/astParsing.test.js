@@ -10,7 +10,7 @@ import {
   generateAST,
   isESMFile
 } from '../functions/createReview/astParsing/index.js'
-import { isArrayFunctionCall } from '../functions/createReview/astParsing/rules/P10_loop_await.js'
+import { isArrayFunctionCall } from '../functions/createReview/astParsing/rules/no_loop_await.js'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
@@ -64,7 +64,7 @@ function loadExampleFile(relativeFilePath) {
 }
 
 describe('AST parsing - rules testing', () => {
-  test('P10 - isArrayFunctionCall(node, "map")', () => {
+  test('no_loop_await - isArrayFunctionCall(node, "map")', () => {
     const arrayMapASTNode = {
       type: 'ExpressionStatement',
       expression: {
@@ -92,7 +92,7 @@ describe('AST parsing - rules testing', () => {
     assert.ok(isArrayFunctionCall(arrayMapASTNode, 'map'))
   })
 
-  test('P10 - isArrayFunctionCall(node, "map")', () => {
+  test('no_loop_await - isArrayFunctionCall(node, "map")', () => {
     const arrayMapASTNode = {
       type: 'ExpressionStatement',
       expression: {
@@ -120,12 +120,11 @@ describe('AST parsing - rules testing', () => {
     assert.ok(isArrayFunctionCall(arrayMapASTNode, 'forEach'))
   })
 
-  test('P10 - nominal', () => {
+  test('no_loop_await - nominal', () => {
     const { fileContent, diff } = loadExampleFile(
-      '../functions/createReview/astParsing/rules/P10.example.js'
+      '../functions/createReview/astParsing/rules/no_loop_await.example.js'
     )
     const ast = generateAST(fileContent, diff)
-    fs.writeFileSync('p10.ast.json', JSON.stringify(ast, null, 2), 'utf8')
     const violations = parseForIssues(ast, diff).map(removeDescription)
 
     const expectedViolations = parseForExpectedViolations(fileContent)
@@ -133,7 +132,7 @@ describe('AST parsing - rules testing', () => {
     assert.deepEqual(violations, expectedViolations)
   })
 
-  test('P10 - parse if line has been updated in the PR', () => {
+  test('no_loop_await - parse if line has been updated in the PR', () => {
     const fileContent = `async function test1() {
       for(let i = 0 ; i < 10 ; i++) {
         await myPromise()
@@ -151,10 +150,10 @@ describe('AST parsing - rules testing', () => {
     }
     const ast = generateAST(fileContent, diff)
     const violations = parseForIssues(ast, diff).map(removeDescription)
-    assert.deepEqual(violations, [{ lineNumber: 3, code: 'P10' }])
+    assert.deepEqual(violations, [{ lineNumber: 3, code: 'no_loop_await' }])
   })
 
-  test('P10 - ignore if line has been deleted from the PR', () => {
+  test('no_loop_await - ignore if line has been deleted from the PR', () => {
     const fileContent = `async function test1() {
       for(let i = 0 ; i < 10 ; i++) {
         await myPromise()
@@ -175,7 +174,7 @@ describe('AST parsing - rules testing', () => {
     assert.deepEqual(violations, [])
   })
 
-  test('P10 - report the loop if it has been added around an existing await call`', () => {
+  test('no_loop_await - report the loop if it has been added around an existing await call`', () => {
     const fileContent = `async function test1() {
       for(let i = 0 ; i < 10 ; i++) {
         await myPromise()
@@ -205,12 +204,12 @@ describe('AST parsing - rules testing', () => {
     }
     const ast = generateAST(fileContent, diff)
     const violations = parseForIssues(ast, diff).map(removeDescription)
-    assert.deepEqual(violations, [{ lineNumber: 2, code: 'P10' }])
+    assert.deepEqual(violations, [{ lineNumber: 2, code: 'no_loop_await' }])
   })
 
-  test('P11 - nominal', () => {
+  test('No unbound promise - nominal', () => {
     const { fileContent, diff } = loadExampleFile(
-      '../functions/createReview/astParsing/rules/P11.example.js'
+      '../functions/createReview/astParsing/rules/no_unbound_promise.example.js'
     )
     const ast = generateAST(fileContent, diff)
     const violations = parseForIssues(ast, diff).map(removeDescription)
@@ -220,7 +219,7 @@ describe('AST parsing - rules testing', () => {
     assert.deepEqual(violations, expectedViolations)
   })
 
-  test('P11 unbound promise - parse if line has been updated in the PR', () => {
+  test('No unbound promise - parse if line has been updated in the PR', () => {
     const fileContent = `const promises = []
     Promise.all(promises)
     `
@@ -237,10 +236,12 @@ describe('AST parsing - rules testing', () => {
     const ast = generateAST(fileContent, diff)
     const violations = parseForIssues(ast, diff).map(removeDescription)
 
-    assert.deepEqual(violations, [{ lineNumber: 2, code: 'P11' }])
+    assert.deepEqual(violations, [
+      { lineNumber: 2, code: 'no_unbound_promise' }
+    ])
   })
 
-  test('P11 unbound promise - ignore if line has NOT been updated in the PR', () => {
+  test('No unbound promise - ignore if line has NOT been updated in the PR', () => {
     const fileContent = `const promises = []
     Promise.all(promises)
     `
@@ -257,6 +258,17 @@ describe('AST parsing - rules testing', () => {
     const ast = generateAST(fileContent, diff)
     const violations = parseForIssues(ast, diff).map(removeDescription)
     assert.deepEqual(violations, [])
+  })
+  test('No console', () => {
+    const { fileContent, diff } = loadExampleFile(
+      '../functions/createReview/astParsing/rules/no_console.example.js'
+    )
+    const ast = generateAST(fileContent, diff)
+    const violations = parseForIssues(ast, diff).map(removeDescription)
+
+    const expectedViolations = parseForExpectedViolations(fileContent)
+    assert.notEqual(violations.length, 0)
+    assert.deepEqual(violations, expectedViolations)
   })
 })
 
