@@ -11,6 +11,20 @@ async function test1() {
   }
 }
 
+async function test2() {
+  for(let i = 0 ; i < 10 ; i++) {
+    // expect:P10
+    await myPromise()
+  }
+}
+
+async function test3() {
+  for(let i = 0 ; i < 10 ; i++) {
+    // expect:P10
+    await myPromise()
+  }
+}
+
 // function test2() {
 //   [1,2,3].map(async () => await myPromise())
 // }
