@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert'
-import { readFileSync } from 'fs'
+import fs from 'fs'
 
 import path from 'path'
 import url from 'url'
@@ -10,6 +10,7 @@ import {
   generateAST,
   isESMFile
 } from '../functions/createReview/astParsing/index.js'
+import { isArrayFunctionCall } from '../functions/createReview/astParsing/rules/P10_loop_await.js'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
@@ -38,7 +39,7 @@ function removeDescription(violation) {
 }
 
 function loadExampleFile(relativeFilePath) {
-  const exampleFileContent = readFileSync(
+  const exampleFileContent = fs.readFileSync(
     path.join(__dirname, relativeFilePath),
     'utf8'
   )
@@ -62,26 +63,69 @@ function loadExampleFile(relativeFilePath) {
   }
 }
 
-describe('AST parsing intergration testing', () => {
-  test('P10 - nominal', () => {
-    const { fileContent, diff } = loadExampleFile(
-      '../functions/createReview/astParsing/rules/P10.example.js'
-    )
-    const ast = generateAST(fileContent, diff)
-    const violations = parseForIssues(ast, diff).map(removeDescription)
-
-    const expectedViolations = parseForExpectedViolations(fileContent)
-    assert.notEqual(violations.length, 0)
-    assert.deepEqual(violations, expectedViolations)
-  })
-})
-
 describe('AST parsing - rules testing', () => {
+  test('P10 - isArrayFunctionCall(node, "map")', () => {
+    const arrayMapASTNode = {
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'CallExpression',
+        callee: {
+          type: 'MemberExpression',
+          object: {
+            type: 'ArrayExpression'
+          },
+          property: {
+            type: 'Identifier',
+            name: 'map'
+          }
+        },
+        arguments: [
+          {
+            type: 'ArrowFunctionExpression',
+            body: {
+              type: 'AwaitExpression'
+            }
+          }
+        ]
+      }
+    }
+    assert.ok(isArrayFunctionCall(arrayMapASTNode, 'map'))
+  })
+
+  test('P10 - isArrayFunctionCall(node, "map")', () => {
+    const arrayMapASTNode = {
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'CallExpression',
+        callee: {
+          type: 'MemberExpression',
+          object: {
+            type: 'Identifier'
+          },
+          property: {
+            type: 'Identifier',
+            name: 'forEach'
+          }
+        },
+        arguments: [
+          {
+            type: 'ArrowFunctionExpression',
+            body: {
+              type: 'AwaitExpression'
+            }
+          }
+        ]
+      }
+    }
+    assert.ok(isArrayFunctionCall(arrayMapASTNode, 'forEach'))
+  })
+
   test('P10 - nominal', () => {
     const { fileContent, diff } = loadExampleFile(
       '../functions/createReview/astParsing/rules/P10.example.js'
     )
     const ast = generateAST(fileContent, diff)
+    fs.writeFileSync('p10.ast.json', JSON.stringify(ast, null, 2), 'utf8')
     const violations = parseForIssues(ast, diff).map(removeDescription)
 
     const expectedViolations = parseForExpectedViolations(fileContent)
