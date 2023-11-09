@@ -8,7 +8,7 @@ export default function validator(node) {
     if (jsonStringifyChildNode) {
       return {
         lineNumber: node.loc.start.line,
-        code: 'J3',
+        code: 'no_parse_stringify',
         description:
           'Do not use JSON.parse(JSON.stringify(obj)) to clone objects because it is slow and resource intensive. Prefer a specialised library like [rfdc](https://github.com/davidmarkclements/rfdc).'
       }

@@ -1,6 +1,6 @@
 export function example() {
   const obj = {'foo': 'bar'}
 
-  // expect: J3
+  // expect: no_parse_stringify
   JSON.parse(JSON.stringify(obj))
 }

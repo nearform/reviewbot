@@ -1,4 +1,7 @@
 import { filterAcceptedFiles, filterOnlyModified } from '../utils.js'
+import pino from 'pino'
+
+const logger = pino({ name: 'reviewbot' })
 
 export function groupByLineRange({ modifiedLines }) {
   const output = []
@@ -54,7 +57,7 @@ function buildPrompt(payload) {
       }))
     }
   })
-  console.log(`[reviewbot] - built ${result.length} prompts`, result)
+  logger.info(`built ${result.length} prompts`, { prompts: result })
   return result
 }
 

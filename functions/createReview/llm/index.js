@@ -18,7 +18,7 @@ async function createLLMSuggestions(gitDiff) {
         transformerType: 'chatGPT',
         payload: filePrompt.changes
       })
-      // console.log(transformerResponse)
+
       transformerResponse.forEach((suggestion, index) => {
         suggestionsForFile = {
           filename: filePrompt.fileName,
