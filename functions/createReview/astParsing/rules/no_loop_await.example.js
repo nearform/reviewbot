@@ -6,7 +6,7 @@ const myPromise = new Promise((resolve, reject) => {
 
 async function testFor() {
   for(let i = 0 ; i < 10 ; i++) {
-    // expect:P10
+    // expect:no_loop_await
     await myPromise()
   }
 }
@@ -14,7 +14,7 @@ async function testFor() {
 async function testForOf() {
   const promises = [myPromise, myPromise]
   for(let promise of promises) {
-    // expect:P10
+    // expect:no_loop_await
     await promise()
   }
 }
@@ -22,7 +22,7 @@ async function testForOf() {
 async function testForIn() {
   const promises = [myPromise, myPromise]
   for(let i in promises) {
-    // expect:P10
+    // expect:no_loop_await
     await promises[i]()
   }
 }
@@ -30,7 +30,7 @@ async function testForIn() {
 async function testWhile() {
   let i = 0;
   while(i < 10) {
-    // expect:P10
+    // expect:no_loop_await
     await myPromise()
     i++
   }
@@ -39,19 +39,19 @@ async function testWhile() {
 async function testDoWhile() {
   let i = 0;
   do {
-    // expect:P10
+    // expect:no_loop_await
     await myPromise()
     i++
   } while(i < 10)
 }
 
 function testArrayMap() {
-  // expect:P10
+  // expect:no_loop_await
   [1,2,3].map(async () => await myPromise())
 }
 
 async function testArrayForEach() {
   const promises = [myPromise, myPromise]
-  // expect:P10
+  // expect:no_loop_await
   promises.forEach(async promise => await promise())
 }

@@ -58,15 +58,27 @@ export default async function app(message) {
 
   const octokit = await getOctokit(messageContext.installationId)
 
-  await octokit.rest.pulls.createReview({
-    repo: messageContext.repo,
-    owner: messageContext.owner,
-    pull_number: messageContext.pull_number,
-    commit_id: messageContext.latestCommit,
-    body: 'Please take a look at my comments.',
-    event: 'COMMENT',
-    comments: comments
-  })
+  if (comments.length > 0) {
+    await octokit.rest.pulls.createReview({
+      repo: messageContext.repo,
+      owner: messageContext.owner,
+      pull_number: messageContext.pull_number,
+      commit_id: messageContext.latestCommit,
+      body: 'Please take a look at my comments.',
+      event: 'COMMENT',
+      comments: comments
+    })
+  } else {
+    await octokit.rest.pulls.createReview({
+      repo: messageContext.repo,
+      owner: messageContext.owner,
+      pull_number: messageContext.pull_number,
+      commit_id: messageContext.latestCommit,
+      body: 'Looks good! No comments.',
+      event: 'COMMENT',
+      comments: []
+    })
+  }
 
   logger.info('review finished')
 }

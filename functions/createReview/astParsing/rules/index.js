@@ -1,6 +1,13 @@
-import J3 from './J3_no_parse_stringify.js'
-import J8 from './J8_no_var.js'
-import P10 from './P10_loop_await.js'
-import P11 from './P11_unbound_promise.js'
+import noParseStringify from './no_parse_stringify.js'
+import noVar from './no_var.js'
+import noLoopAwait from './no_loop_await.js'
+import noUnboundPromise from './no_unbound_promise.js'
+import noConsole from './no_console.js'
 
-export default [J3, J8, P10, P11]
+export default [
+  noParseStringify,
+  noVar,
+  noLoopAwait,
+  noUnboundPromise,
+  noConsole
+]
