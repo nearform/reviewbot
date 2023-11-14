@@ -1,6 +1,6 @@
 {
     "name": "reviewbot",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "private": true,
     "description": "A bot to assist with code reviews via AI.",
     "author": "richiemccoll",
