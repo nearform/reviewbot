@@ -85,7 +85,13 @@ export function shouldTriggerLLMReview(payload) {
 }
 
 export function shouldTriggerRuleBasedReview(payload) {
-  return payload.pull_request && payload.action === 'ready_for_review'
+  const pullRequest = payload.pull_request
+  return (
+    pullRequest &&
+    pullRequest.user.type === 'User' &&
+    (payload.action === 'ready_for_review' ||
+      (payload.action === 'opened' && pullRequest.draft === false))
+  )
 }
 
 export async function triggerLLMReview(context) {
