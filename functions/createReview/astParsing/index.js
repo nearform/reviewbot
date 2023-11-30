@@ -17,10 +17,13 @@ function getParser(fileName) {
   switch (fileExtension) {
     case '.ts':
     case '.tsx':
+      logger.info(`Using TS parser for file ${fileName}`)
       return Parser.extend(tsPlugin())
     case '.jsx':
+      logger.info(`Using JSX parser for file ${fileName}`)
       return Parser.extend(jsxPlugin())
     case '.js':
+      logger.info(`Using standard parser for file ${fileName}`)
       return Parser
   }
   return null
@@ -36,14 +39,16 @@ export function generateAST(fileContent, fileDiff) {
   const parser = getParser(fileDiff.afterName)
   if (!parser) return
   let ast
+  const sourceType = isESMFile(fileContent) ? 'module' : 'commonjs'
   try {
     ast = parser.parse(fileContent, {
-      sourceType: isESMFile(fileContent) ? 'module' : 'commonjs',
+      sourceType: sourceType,
       locations: true
     })
   } catch (err) {
+    logger.info(err)
     logger.info(
-      `Failed to parse the file content for [${fileDiff.afterName}] into AST. Falling back to the loose parser. Error: ${err.message}`
+      `Failed to parse the file content for [${fileDiff.afterName}] with sourceType=${sourceType} into AST. Falling back to the loose parser. Error: ${err.message}`
     )
     ast = LooseParser.parse(fileContent, { locations: true })
   }

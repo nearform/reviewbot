@@ -26,6 +26,10 @@ export default async app => {
         await triggerLLMReview(context)
       } else if (shouldTriggerRuleBasedReview(context.payload)) {
         await triggerRuleBasedReview(context)
+      } else {
+        logger.info(
+          `Ignoring event '${context.name}' -> '${context.payload.action}' with id=${context.id}`
+        )
       }
     } catch (error) {
       logger.error(error)

@@ -31,6 +31,8 @@ function isCalleeFunction(node, callFunctionName) {
 
 export function isArrayFunctionCall(node, functionName) {
   return (
+    !!node &&
+    !!node.type &&
     node.type === 'ExpressionStatement' &&
     node.expression.type === 'CallExpression' &&
     (isCalleeOfType(node, 'ArrayExpression') ||
