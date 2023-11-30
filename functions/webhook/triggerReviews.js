@@ -95,6 +95,7 @@ export function shouldTriggerRuleBasedReview(payload) {
 }
 
 export async function triggerLLMReview(context) {
+  logger.info('Triggering LLM code review')
   const data = await fetchGithubData(context)
   data.reviewType = REVIEW_TYPE.LLM
   const messageId = await publishMessage(data)
@@ -112,6 +113,7 @@ export async function triggerLLMReview(context) {
 }
 
 export async function triggerRuleBasedReview(context) {
+  logger.info('Triggering a rule based code review')
   const data = await fetchGithubData(context)
   data.reviewType = REVIEW_TYPE.RuleBased
   await publishMessage(data)
