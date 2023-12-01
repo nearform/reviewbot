@@ -1,0 +1,12 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 898cc83..eebeccc 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -5,6 +5,7 @@ import { useAuthContext } from './hooks/useAuthContext'
+
+  function App() {
+    const { isLoggedIn, login } = useAuthContext()
++  console.log('hello world')
+    return (
+      <>
+        <div className="flex flex-col min-h-screen justify-between">

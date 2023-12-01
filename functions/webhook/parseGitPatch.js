@@ -67,8 +67,8 @@ export function parseGitPatch(patch) {
 
       const [, a, b] = match4
 
-      let nA = parseInt(a)
-      let nB = parseInt(b)
+      let nA = parseInt(a) - 1
+      let nB = parseInt(b) - 1
 
       lines.forEach(line => {
         nA++

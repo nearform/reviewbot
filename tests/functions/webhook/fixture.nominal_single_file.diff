@@ -1,0 +1,19 @@
+diff --git a/functions/webhook/triggerReviews.js b/functions/webhook/triggerReviews.js
+index 316c3a5..2b2e758 100644
+--- a/functions/webhook/triggerReviews.js
++++ b/functions/webhook/triggerReviews.js
+@@ -85,7 +85,13 @@ export function shouldTriggerLLMReview(payload) {
+ }
+
+ export function shouldTriggerRuleBasedReview(payload) {
+-  return payload.pull_request && payload.action === 'ready_for_review'
++  const pullRequest = payload.pull_request
++  return (
++    pullRequest &&
++    pullRequest.user.type === 'User' &&
++    (payload.action === 'ready_for_review' ||
++      (payload.action === 'opened' && pullRequest.draft === false))
++  )
+ }
+
+ export async function triggerLLMReview(context) {
