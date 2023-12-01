@@ -1,0 +1,50 @@
+diff --git a/package.json b/package.json
+index babfea0..abf98a6 100644
+--- a/package.json
++++ b/package.json
+@@ -2,7 +2,10 @@
+   "name": "@nearform/quantum",
+   "version": "0.2.0",
+   "description": "Component library based on the Quantum Design System",
+-  "main": "dist/index.js",
++  "exports": {
++    ".": "./dist/index.js",
++    "./plugin": "./dist/plugin.js"
++  },
+   "scripts": {
+     "build": "tsup",
+     "lint": "eslint .",
+diff --git a/src/plugin.js b/src/plugin.js
+new file mode 100644
+index 0000000..3f8185c
+--- /dev/null
++++ b/src/plugin.js
+@@ -0,0 +1,10 @@
++const quantumConfig = require('../tailwind.config.js')
++const plugin = require('tailwindcss/plugin')
++
++const quantumPlugin = plugin(() => {}, {
++  theme: {
++    ...quantumConfig.theme
++  }
++})
++
++module.exports = quantumPlugin
+diff --git a/tsup.config.ts b/tsup.config.ts
+index 143fd12..c0e6ed0 100644
+--- a/tsup.config.ts
++++ b/tsup.config.ts
+@@ -1,7 +1,12 @@
+ import { defineConfig } from 'tsup'
+
+ export default defineConfig({
+-  entry: ['src/index.ts', 'src/global.css', 'src/colors/index.ts'],
++  entry: [
++    'src/index.ts',
++    'src/global.css',
++    'src/colors/index.ts',
++    'src/plugin.js'
++  ],
+   dts: { entry: ['src/index.ts'] },
+   clean: true,
+   sourcemap: true
