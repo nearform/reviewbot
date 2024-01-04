@@ -38,7 +38,7 @@
     },
     "devDependencies": {
         "@commitlint/cli": "^18.4.4",
-        "@commitlint/config-conventional": "^18.4.3",
+        "@commitlint/config-conventional": "^18.4.4",
         "dotenv": "^16.3.1",
         "eslint": "^8.56.0",
         "eslint-config-prettier": "^9.1.0",
