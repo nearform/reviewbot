@@ -34,7 +34,7 @@
         "parse-diff": "^0.11.1",
         "parse-git-patch": "^1.2.2",
         "pino": "^8.17.2",
-        "probot": "^12.3.3"
+        "probot": "^13.0.0"
     },
     "devDependencies": {
         "@commitlint/cli": "^18.5.0",
