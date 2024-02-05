@@ -47,7 +47,7 @@
         "husky": "^9.0.10",
         "lint-staged": "^15.2.1",
         "prettier": "^2.8.8",
-        "smee-client": "^2.0.0"
+        "smee-client": "^2.0.1"
     },
     "engines": {
         "node": ">= 10.13.0"
