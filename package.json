@@ -1,66 +1,66 @@
 {
-    "name": "reviewbot",
-    "version": "1.2.7",
-    "private": true,
-    "description": "A bot to assist with code reviews via AI.",
-    "author": "richiemccoll",
-    "type": "module",
-    "homepage": "https://github.com/nearform/reviewbot",
-    "keywords": [
-        "probot",
-        "github",
-        "probot-app"
-    ],
-    "scripts": {
-        "prepare": "npx husky install",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
-        "start": "probot run ./functions/webhook/app.js",
-        "dev": "node --watch indexDev.js",
-        "dev:pubsub": "node --watch -r dotenv/config pubsubDev.js",
-        "debug": "node --inspect-brk indexDev.js",
-        "test": "node --test tests/",
-        "test:watch": "node --test --watch tests/"
-    },
-    "dependencies": {
-        "@google-cloud/pubsub": "^4.3.3",
-        "@octokit/auth-app": "^6.0.4",
-        "acorn": "^8.11.3",
-        "acorn-jsx": "^5.3.2",
-        "acorn-loose": "^8.4.0",
-        "acorn-typescript": "^1.4.13",
-        "map-line-to-diff": "^1.0.0-beta.2",
-        "octokit": "^3.1.2",
-        "parse-diff": "^0.11.1",
-        "parse-git-patch": "^1.2.2",
-        "pino": "^8.19.0",
-        "probot": "^13.1.2"
-    },
-    "devDependencies": {
-        "@commitlint/cli": "^19.2.1",
-        "@commitlint/config-conventional": "^19.1.0",
-        "dotenv": "^16.4.5",
-        "eslint": "^8.57.0",
-        "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-prettier": "^4.2.1",
-        "fetch-mock": "^9.11.0",
-        "husky": "^9.0.11",
-        "lint-staged": "^15.2.2",
-        "prettier": "^2.8.8",
-        "smee-client": "^2.0.1"
-    },
-    "engines": {
-        "node": ">= 10.13.0"
-    },
-    "main": "index.js",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/nearform/reviewbot.git"
-    },
-    "bugs": {
-        "url": "https://github.com/nearform/reviewbot/issues"
-    },
-    "lint-staged": {
-        "*.js": "eslint --cache --fix"
-    }
+  "name": "reviewbot",
+  "version": "1.2.7",
+  "private": true,
+  "description": "A bot to assist with code reviews via AI.",
+  "author": "richiemccoll",
+  "type": "module",
+  "homepage": "https://github.com/nearform/reviewbot",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "prepare": "npx husky",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "start": "probot run ./functions/webhook/app.js",
+    "dev": "node --watch indexDev.js",
+    "dev:pubsub": "node --watch -r dotenv/config pubsubDev.js",
+    "debug": "node --inspect-brk indexDev.js",
+    "test": "node --test tests/",
+    "test:watch": "node --test --watch tests/"
+  },
+  "dependencies": {
+    "@google-cloud/pubsub": "^4.3.3",
+    "@octokit/auth-app": "^6.0.4",
+    "acorn": "^8.11.3",
+    "acorn-jsx": "^5.3.2",
+    "acorn-loose": "^8.4.0",
+    "acorn-typescript": "^1.4.13",
+    "map-line-to-diff": "^1.0.0-beta.2",
+    "octokit": "^3.1.2",
+    "parse-diff": "^0.11.1",
+    "parse-git-patch": "^1.2.2",
+    "pino": "^8.19.0",
+    "probot": "^13.1.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "fetch-mock": "^9.11.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^2.8.8",
+    "smee-client": "^2.0.1"
+  },
+  "engines": {
+    "node": ">= 10.13.0"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nearform/reviewbot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nearform/reviewbot/issues"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
+  }
 }
