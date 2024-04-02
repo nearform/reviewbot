@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@google-cloud/pubsub": "^4.3.3",
-    "@octokit/auth-app": "^6.0.4",
+    "@octokit/auth-app": "^6.0.5",
     "acorn": "^8.11.3",
     "acorn-jsx": "^5.3.2",
     "acorn-loose": "^8.4.0",
