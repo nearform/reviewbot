@@ -46,7 +46,7 @@
     "fetch-mock": "^10.0.7",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.7",
-    "prettier": "^3.3.2",
+    "prettier": "^3.3.3",
     "smee-client": "^2.0.1"
   },
   "engines": {
