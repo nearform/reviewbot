@@ -33,7 +33,7 @@
     "octokit": "^4.0.2",
     "parse-diff": "^0.11.1",
     "parse-git-patch": "^1.2.2",
-    "pino": "^9.3.2",
+    "pino": "^9.4.0",
     "probot": "^13.3.7"
   },
   "devDependencies": {
