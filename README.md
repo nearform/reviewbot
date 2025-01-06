@@ -38,3 +38,5 @@ Before running, ensure that you have followed the [steps here](https://cloud.goo
 
 To test that everything is setup correctly. Try tagging the bot in a comment on a repo where you have it installed
   - `/reviewbot review`
+
+[![banner](https://raw.githubusercontent.com/nearform/.github/refs/heads/master/assets/os-banner-green.svg)](https://www.nearform.com/contact/?utm_source=open-source&utm_medium=banner&utm_campaign=os-project-pages)
